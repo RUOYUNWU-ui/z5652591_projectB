@@ -1,0 +1,406 @@
+{
+  "schema_version": 1,
+  "provenance": "Student-supplied manual labels; preserved by run_part_b.py",
+  "records": [
+    {
+      "headline_id": 1425,
+      "title_sha256": "2d4efd6c75bcfd64e257882cfd1d91e6ce48ade6c8f0249fe9bb3065387fe8bc",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "General sector introduction with no explicit positive or negative sentiment",
+      "review_complete": true
+    },
+    {
+      "headline_id": 41913,
+      "title_sha256": "5afe580253b6a9316028ad84cad4e1a1a56b638b88312e8304bec9198171a544",
+      "student_label": "neutral",
+      "student_confidence": 4,
+      "student_notes": "Reports option trading activity only; does not reflect business performance",
+      "review_complete": true
+    },
+    {
+      "headline_id": 48492,
+      "title_sha256": "5c2a80e0c6c131bc6660267ce0dc2b279bfd0a032974286de4728f7006f19fe1",
+      "student_label": "positive",
+      "student_confidence": 5,
+      "student_notes": "Positive financial milestone and improved dividend outlook",
+      "review_complete": true
+    },
+    {
+      "headline_id": 103885,
+      "title_sha256": "aaa30638df33bb34bdf0e3647ad0de7ff47767eb8ad0584f02e704d0ecbf4119",
+      "student_label": "positive",
+      "student_confidence": 4,
+      "student_notes": "Earnings beat is positive; revenue decline is secondary",
+      "review_complete": true
+    },
+    {
+      "headline_id": 127932,
+      "title_sha256": "ede7484cb127ff7a863406d2fcfcf4918f97f5a82c7e15e4fe1da9cf0fb0d83d",
+      "student_label": "neutral",
+      "student_confidence": 4,
+      "student_notes": "Maintains existing rating; no upgrade or downgrade",
+      "review_complete": true
+    },
+    {
+      "headline_id": 11505,
+      "title_sha256": "4a558d5dacb57051af828211ea586b0a2e501c5d2bc2dd89a14f38bfbf27fd8c",
+      "student_label": "positive",
+      "student_confidence": 3,
+      "student_notes": "Product improvement supports brand reputation; indirect positive impact",
+      "review_complete": true
+    },
+    {
+      "headline_id": 29916,
+      "title_sha256": "24b428f1869a72cc5b905623d4d0c2eb1ba63beb529366e16b3703925902547a",
+      "student_label": "negative",
+      "student_confidence": 5,
+      "student_notes": "Large-scale layoffs typically signal business pressure and weakness",
+      "review_complete": true
+    },
+    {
+      "headline_id": 97721,
+      "title_sha256": "caaccdded248a0b11b7ed0d406a36b9a61d361e7e448a63a138ed1ba69d8e02d",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "General investment advice about ETFs; no direct sentiment toward WMT",
+      "review_complete": true
+    },
+    {
+      "headline_id": 104523,
+      "title_sha256": "4bae8ab3460e6d8cde347bfa123f4cfd5ab61279636f7930d5378e90452e3d89",
+      "student_label": "neutral",
+      "student_confidence": 4,
+      "student_notes": "Article discusses other companies; irrelevant to DIS with no sentiment",
+      "review_complete": true
+    },
+    {
+      "headline_id": 131034,
+      "title_sha256": "e9d34a724cc9683bc3ca62c1800e3b0d0fa26ae938aa750b4dc20e7c84bec15d",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "Macroeconomic analysis only; no direct impact or sentiment regarding WMT",
+      "review_complete": true
+    },
+    {
+      "headline_id": 22150,
+      "title_sha256": "065734546c7e93cabcea02b1212e1df8cf36b3f2d4f4b40e324e07d05755f011",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "XOM not mentioned; neutral market recap with no sentiment",
+      "review_complete": true
+    },
+    {
+      "headline_id": 61273,
+      "title_sha256": "2b4da2715ac0f1232ab5ec37b45a0b502adf1d2332f8b658534b2c9113bfa2d6",
+      "student_label": "negative",
+      "student_confidence": 4,
+      "student_notes": "Activist shareholder pressure introduces regulatory and reputational risks",
+      "review_complete": true
+    },
+    {
+      "headline_id": 83875,
+      "title_sha256": "beb4f6b2071b1a59f22daa1a268fe811f80d41b3f58bb933fccfe6d9b56b7a0f",
+      "student_label": "neutral",
+      "student_confidence": 2,
+      "student_notes": "OXY is listed without any positive or negative commentary",
+      "review_complete": true
+    },
+    {
+      "headline_id": 84016,
+      "title_sha256": "c469392abcedf3ad944ce355c842f824bf026f734f344cb9332c7e36ff11c783",
+      "student_label": "negative",
+      "student_confidence": 4,
+      "student_notes": "Underperforming market performance suggests relative weakness",
+      "review_complete": true
+    },
+    {
+      "headline_id": 146107,
+      "title_sha256": "ac21b015e389a912b1896f7afd2ce3a4ea8de8b7e576c13386ba919122d70f13",
+      "student_label": "neutral",
+      "student_confidence": 5,
+      "student_notes": "New options listing is a routine event with no financial sentiment",
+      "review_complete": true
+    },
+    {
+      "headline_id": 30884,
+      "title_sha256": "b1baae8c1e249a5782dc68fbcfcc1bd5770294385128779bf3f5271a3f8b2163",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "General market news; no specific sentiment regarding WFC",
+      "review_complete": true
+    },
+    {
+      "headline_id": 63401,
+      "title_sha256": "31fe7d51fbaf7f1893b7f093e4022da860ff7b3268590f34d6970071746013a2",
+      "student_label": "neutral",
+      "student_confidence": 4,
+      "student_notes": "Financing arrangement is a neutral corporate activity",
+      "review_complete": true
+    },
+    {
+      "headline_id": 111826,
+      "title_sha256": "f6b5a3bc999dd5e4157faa204bda4cfefe47a49a789439133babf152d1a0e050",
+      "student_label": "negative",
+      "student_confidence": 3,
+      "student_notes": "Rate-hike pressure weighs on financials; MS not specifically targeted",
+      "review_complete": true
+    },
+    {
+      "headline_id": 139092,
+      "title_sha256": "e444241c4d24acf66610cadba73bd65ec622bfbbaacc494b40f2ff542864140b",
+      "student_label": "positive",
+      "student_confidence": 5,
+      "student_notes": "Strong earnings and dividend increase are clear positive signals",
+      "review_complete": true
+    },
+    {
+      "headline_id": 143368,
+      "title_sha256": "594cdb282d574ac54bd53ae7a88775ef9e11dbba7168fb024a5e978880de4bf2",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "Observational tone; challenges noted but no explicit negative call",
+      "review_complete": true
+    },
+    {
+      "headline_id": 23145,
+      "title_sha256": "851e0658649a8a101663f01f1fb62da3c231289e551dcaec32777307041e0d0d",
+      "student_label": "negative",
+      "student_confidence": 5,
+      "student_notes": "Regulatory rejection of a drug candidate is clearly negative",
+      "review_complete": true
+    },
+    {
+      "headline_id": 25010,
+      "title_sha256": "3f8a25f5129bd12310c3b0d50a62044ddbaae54c5643d017dabe9b55e9e19aae",
+      "student_label": "positive",
+      "student_confidence": 4,
+      "student_notes": "Analyst recognition and expected capital appreciation are positive",
+      "review_complete": true
+    },
+    {
+      "headline_id": 49194,
+      "title_sha256": "09dba6041f03e76d21d14abdcc6585471675330f44e5670834558d2be0d5331d",
+      "student_label": "neutral",
+      "student_confidence": 2,
+      "student_notes": "Generic listing; no specific evaluation or sentiment about ABBV",
+      "review_complete": true
+    },
+    {
+      "headline_id": 111876,
+      "title_sha256": "b6769369f7b94eee3ce10c1b47057e5dbf40650ddf8b33f61f6ae12df23bc336",
+      "student_label": "positive",
+      "student_confidence": 4,
+      "student_notes": "Strategic acquisition strengthens pipeline; viewed positively long-term",
+      "review_complete": true
+    },
+    {
+      "headline_id": 126572,
+      "title_sha256": "261a0a30039b375eae2c2c1f8545666f45f81162538ea6d0ab7bba7e80a1d9ff",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "Broader market decline; no specific commentary on MRK performance",
+      "review_complete": true
+    },
+    {
+      "headline_id": 5866,
+      "title_sha256": "226d184cf5d729ace38fb6635e2c244cebf0b17b041c8e3da7bfffe80c1d6aea",
+      "student_label": "negative",
+      "student_confidence": 4,
+      "student_notes": "Public health warning creates market uncertainty; negative for industrials",
+      "review_complete": true
+    },
+    {
+      "headline_id": 12229,
+      "title_sha256": "a25700c8098e582d16b6cc02487e4363e9e267f02ac962a616572509e67c21e3",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "Appears on a movers list; direction and cause unspecified",
+      "review_complete": true
+    },
+    {
+      "headline_id": 39161,
+      "title_sha256": "ce00981fa26003240632461796b929bfac46e2cd96480bedf642b31ff0110e78",
+      "student_label": "positive",
+      "student_confidence": 4,
+      "student_notes": "Profit down but beat consensus; results exceed market expectations",
+      "review_complete": true
+    },
+    {
+      "headline_id": 56873,
+      "title_sha256": "d8f26342943584614dab825d255fc30844b48cb3f6d43432727970b50c791a8c",
+      "student_label": "positive",
+      "student_confidence": 4,
+      "student_notes": "Implies undervaluation and future upside; positive forward view",
+      "review_complete": true
+    },
+    {
+      "headline_id": 90793,
+      "title_sha256": "91a5a460801b2d3182ab57dff6503e4ca711155cfc30a443ba5b208e9ef55ec2",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "Industry context; no direct assessment or sentiment on UPS",
+      "review_complete": true
+    },
+    {
+      "headline_id": 2786,
+      "title_sha256": "de1a7245317ab97916c8b0d3d79ac50e2a54ae06044c54e9414b382ca91dc937",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "Market mixed; DOW mentioned as index component; no clear sentiment",
+      "review_complete": true
+    },
+    {
+      "headline_id": 27447,
+      "title_sha256": "8b587037bf2737400566c3f823b10dedc5a7c288501faa0a71fd28b0a33e29fc",
+      "student_label": "neutral",
+      "student_confidence": 4,
+      "student_notes": "Identifies price movers only; no direction or cause stated",
+      "review_complete": true
+    },
+    {
+      "headline_id": 28844,
+      "title_sha256": "a55232e86c97fffbd1afb86fa8c380e6d7859cff0aff0c1c85354c362c734cd6",
+      "student_label": "negative",
+      "student_confidence": 4,
+      "student_notes": "Stricter regulation and rising costs are negative for the industry",
+      "review_complete": true
+    },
+    {
+      "headline_id": 84810,
+      "title_sha256": "7bb15707c169ee5116c3abdcd3a16465a11d35f1612cdc71195d861064d8ebe9",
+      "student_label": "positive",
+      "student_confidence": 4,
+      "student_notes": "Featured as a top-quality dividend stock; positive endorsement",
+      "review_complete": true
+    },
+    {
+      "headline_id": 113196,
+      "title_sha256": "9829b841fe03b053af8cdc2bb4100eebc847037c748286f6b7271593c788c3c2",
+      "student_label": "neutral",
+      "student_confidence": 4,
+      "student_notes": "Preview before release; outcome unknown, so neutral judgment",
+      "review_complete": true
+    },
+    {
+      "headline_id": 40120,
+      "title_sha256": "f0c64288d97ada63cabe944010250b5fa4755c4325a74d302cbf70be8aca48dc",
+      "student_label": "positive",
+      "student_confidence": 3,
+      "student_notes": "Strong capital flows into related ETFs suggest positive sentiment",
+      "review_complete": true
+    },
+    {
+      "headline_id": 77022,
+      "title_sha256": "6a83b83037d44cf167b99b75945a03f59c3e2d456670d7519780da1df4ac004f",
+      "student_label": "neutral",
+      "student_confidence": 5,
+      "student_notes": "Announces call time only; no financial or sentiment content",
+      "review_complete": true
+    },
+    {
+      "headline_id": 85718,
+      "title_sha256": "369de5e54cac2aaf39a52d52cd8e2e619f8a46545e845df08bc71711c99b7de3",
+      "student_label": "positive",
+      "student_confidence": 4,
+      "student_notes": "Author explicitly expresses personal preference; positive tone",
+      "review_complete": true
+    },
+    {
+      "headline_id": 106913,
+      "title_sha256": "ff13033bc2c87d7d78b1f36df091e86ee3402444cf43e9a95e0dea83f1d37500",
+      "student_label": "positive",
+      "student_confidence": 5,
+      "student_notes": "Strong buy-and-hold recommendation; clearly positive assessment",
+      "review_complete": true
+    },
+    {
+      "headline_id": 114463,
+      "title_sha256": "23159471eceee06aa08a33f149a8e07a6062d1081530ae2e2420ce50b0739e09",
+      "student_label": "positive",
+      "student_confidence": 5,
+      "student_notes": "Outperform rating is a positive recommendation maintained",
+      "review_complete": true
+    },
+    {
+      "headline_id": 1549,
+      "title_sha256": "0adf016c043b4f5a143a4030dc5b0e64c2f56f377cedc795f355afca0938159e",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "Sector recap only; no explicit positive or negative commentary",
+      "review_complete": true
+    },
+    {
+      "headline_id": 71618,
+      "title_sha256": "c599d88a467c4c6c4c4369c33bc8fb9c0e7caac94002cf353c4190c934d233ff",
+      "student_label": "neutral",
+      "student_confidence": 2,
+      "student_notes": "General regulatory discussion; no direct link or sentiment to INTC",
+      "review_complete": true
+    },
+    {
+      "headline_id": 101549,
+      "title_sha256": "b4fd80a1716eb4707655e7c9b61880bcfad0f584ec3beb76a74bc57bb663733f",
+      "student_label": "negative",
+      "student_confidence": 4,
+      "student_notes": "Weak seasonal demand is a clear negative business signal",
+      "review_complete": true
+    },
+    {
+      "headline_id": 103260,
+      "title_sha256": "e4d162cdabcee2a4eea780b525a9be0d6eb24cfc6f1091d4aa794a6e18a9951c",
+      "student_label": "neutral",
+      "student_confidence": 2,
+      "student_notes": "AMD not among listed stocks; irrelevant with no sentiment",
+      "review_complete": true
+    },
+    {
+      "headline_id": 117858,
+      "title_sha256": "01a7f60aabba9c450490611770e241a080266fe36dc48e079826cdfd83c043bb",
+      "student_label": "negative",
+      "student_confidence": 5,
+      "student_notes": "Concerns about slowing growth are a clear negative signal",
+      "review_complete": true
+    },
+    {
+      "headline_id": 3204,
+      "title_sha256": "1f7d2125659dd7f19a21419eeaa27cce21f5e557e02a5d58aae7a83f55fbac27",
+      "student_label": "positive",
+      "student_confidence": 4,
+      "student_notes": "New price high typically reflects market confidence and positive momentum",
+      "review_complete": true
+    },
+    {
+      "headline_id": 106045,
+      "title_sha256": "0e0171aa0491485783be601136010b1ce58fd139e4a27dc89042bea7439d2b4b",
+      "student_label": "neutral",
+      "student_confidence": 5,
+      "student_notes": "Upcoming earnings announcement; no performance assessment yet",
+      "review_complete": true
+    },
+    {
+      "headline_id": 112175,
+      "title_sha256": "855eb0dbb2dc176b8f0e7de3275d1a333df8f67d27364fa26a0983a714a2c76c",
+      "student_label": "positive",
+      "student_confidence": 5,
+      "student_notes": "Confident forecast of earnings beat is clearly positive",
+      "review_complete": true
+    },
+    {
+      "headline_id": 130634,
+      "title_sha256": "db8bbfc685d1181a19e3ca48555e45124ea605429886988047d087154cf04671",
+      "student_label": "neutral",
+      "student_confidence": 3,
+      "student_notes": "Market update; no specific sentiment regarding DUK",
+      "review_complete": true
+    },
+    {
+      "headline_id": 142384,
+      "title_sha256": "eb74b47f98c835ac92008cbce2a768c006f7ab30d929a50f7934ef06bdc2688e",
+      "student_label": "neutral",
+      "student_confidence": 5,
+      "student_notes": "Administrative reminder; dividend event is financially neutral",
+      "review_complete": true
+    }
+  ]
+}

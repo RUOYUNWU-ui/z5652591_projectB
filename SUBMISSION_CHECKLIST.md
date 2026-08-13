@@ -11,11 +11,13 @@ the mechanical ones.
 - [x] At least the required combined fund with two methods, backtested
       out-of-sample with no look-ahead, with a fact sheet.
 - [x] All six Streamlit pages pass the local app test runtime.
-- [ ] The GitHub repo is PUBLIC and the live Streamlit app loads.
+- [x] The GitHub repo is PUBLIC: https://github.com/RUOYUNWU-ui/z5652591_projectB
+- [ ] The live Streamlit app loads in a logged-out browser and its URL is recorded.
 - [x] Raw data loads through src/data_access.py; no raw data or secrets committed.
       (Your derived results/ artifacts - the CSVs the app reads - ARE committed.)
 - [x] AGENTS.md and CLAUDE.md contain project-specific instructions.
 - [x] ai/ contains prompt logs and AI notes.
-- [ ] Complete the 50-headline manual sentiment review and validation.
-- [ ] The writing and interpretation are your own.
-- [ ] Submit: the zip to Moodle, the public repo link, and the live Streamlit URL.
+- [x] Complete the 50-headline manual sentiment review and validation.
+- [x] The final report contains the student's revised financial interpretation.
+- [x] A clean hand-in zip has been prepared locally.
+- [ ] Submit to Moodle: the zip, public repo link, and verified live Streamlit URL.

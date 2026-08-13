@@ -6,7 +6,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from src.portfolios import performance_metrics
+from src.portfolios import performance_metrics, simulate_rebalanced_portfolio
 
 
 def _sentiment_zscores(
@@ -63,9 +63,10 @@ def apply_sentiment(
     window: int = 60,
     min_periods: int = 20,
 ) -> pd.DataFrame:
-    """Apply the frozen multiplicative sentiment tilt to equity weights.
+    """Apply the frozen sector-level sentiment tilt to equity weights.
 
-    The exact rule is ``w_tilde = w_base * (1 + lam * z)`` followed by
+    Every equity ticker inherits the lagged z-score of its sector. The exact
+    rule is ``w_tilde = w_base * (1 + lam * z_sector)`` followed by
     clipping negative equity weights to zero and renormalising them back to
     the base fund's total equity exposure. Crypto/non-equity weights are left
     unchanged. ``lam=0`` reproduces base weights exactly.
@@ -176,11 +177,9 @@ def portfolio_returns_from_weights(
     if schedule.isna().any().any():
         raise ValueError("Weight schedule and return tickers do not match")
 
-    live = matrix.loc[schedule.index.min():]
-    daily_weights = schedule.reindex(live.index).ffill()
-    if daily_weights.isna().any().any():
-        raise RuntimeError("Weight schedule does not cover the full OOS period")
-    portfolio_return = (live * daily_weights).sum(axis=1)
+    # The fusion variants use the same monthly target/rebalance mechanics as
+    # the baseline: holdings drift with realised returns between rebalances.
+    portfolio_return, _, _ = simulate_rebalanced_portfolio(matrix, schedule)
     growth = (1.0 + portfolio_return).cumprod()
     drawdown = growth.div(growth.cummax()).sub(1.0)
     return pd.DataFrame(

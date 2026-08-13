@@ -45,6 +45,18 @@ def test_no_lookahead() -> None:
         sums = result["weights"].groupby("effective_date")["weight"].sum()
         assert np.allclose(sums, 1.0, atol=1e-8)
         assert (result["weights"]["weight"] >= -1e-12).all()
+        pre_trade_sums = result["weights"].groupby("effective_date")[
+            "pre_trade_weight"
+        ].sum()
+        assert np.allclose(pre_trade_sums, 1.0, atol=1e-8)
+        calculated_turnover = result["weights"].groupby("effective_date").apply(
+            lambda frame: 0.5
+            * (frame["weight"] - frame["pre_trade_weight"]).abs().sum(),
+            include_groups=False,
+        )
+        assert np.allclose(
+            calculated_turnover.to_numpy(), result["audit"]["turnover"].to_numpy()
+        )
 
 
 def test_methods_produce_distinct_weights() -> None:

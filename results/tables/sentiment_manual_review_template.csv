@@ -1,51 +1,51 @@
 headline_id,date,ticker,sector,title,plain_score,enhanced_score,student_label,student_confidence,student_notes,review_complete
-1425,2020-01-17,T,Comm,7 5G Stocks to Connect Your Portfolio To,0.0,0.0,,,,False
-41913,2021-03-11,TMUS,Comm,"Notable Thursday Option Activity: TMUS, LRCX, FCX",0.0,0.0,,,,False
-48492,2021-06-16,T,Comm,"Now That Nokia Is Free Cash Flow Positive, Prospects for a Dividend Are High",0.8442,0.8442,,,,False
-103885,2023-02-02,TMUS,Comm,T-Mobile (TMUS) Beats on Q4 Earnings Despite Lower Revenues,0.2235,0.5978,,,,False
-127932,2023-08-10,T,Comm,RBC Capital Maintains AT&T (T) Sector Perform Recommendation,0.0,0.0,,,,False
-11505,2020-04-08,DIS,Consumer,Netflix (NFLX) Toolkit to Help Parents Clean Child Content,0.6597,0.6597,,,,False
-29916,2020-09-29,DIS,Consumer,"Disney to Lay Off 28,000 Workers in Parks, Experiences, and Products Unit",0.0,0.0,,,,False
-97721,2022-11-30,WMT,Consumer,Be Mindful About Retail ETF Investing This Holiday Season,0.4019,0.4019,,,,False
-104523,2023-02-08,DIS,Consumer,Commercial Metals and Ovintiv have been highlighted as Zacks Bull and Bear of the Day,0.0,0.0,,,,False
-131034,2023-08-31,WMT,Consumer,3 Takeaways from the August Inflation Report,0.0,0.0,,,,False
-22150,2020-06-16,XOM,Energy,"BUZZ-U.S. STOCKS ON THE MOVE-Eli Lilly, Turtle Beach, Eldorado Resorts",0.0,0.0,,,,False
-61273,2021-12-13,COP,Energy,Activist group targets Exxon with shareholder climate resolution,0.0,0.0,,,,False
-83875,2022-07-13,OXY,Energy,"Zacks Investment Ideas feature highlights: Apple, Occidental Petroleum and HP",0.0,0.0,,,,False
-84016,2022-07-14,COP,Energy,ConocoPhillips (COP) Dips More Than Broader Markets: What You Should Know,0.0,0.0,,,,False
-146107,2023-12-13,OXY,Energy,OXY August 2024 Options Begin Trading,0.0,0.0,,,,False
-30884,2020-10-12,WFC,Financials,"S&P 500 Gains 57 Points Ahead of Earnings, Huge Apple and Amazon Events, Ford Stock Gets an Upgrade",0.6597,0.8225,,,,False
-63401,2022-01-10,GS,Financials,Saudi Arabia's biggest lender hires banks for sustainable sukuk -document,0.0,0.0,,,,False
-111826,2023-04-17,MS,Financials,US STOCKS-Wall St slips as Fed seen hiking rates in May; State Street sinks,0.0,0.0,,,,False
-139092,2023-10-25,V,Financials,"Visa (V) Q4 Earnings Beat on Cross-Border Volume, Dividend Hiked",0.0,0.4588,,,,False
-143368,2023-11-24,MS,Financials,3 Investment Banks to Watch Despite Industry-Wide Challenges,-0.0572,-0.0572,,,,False
-23145,2020-06-29,GILD,Healthcare,U.S. FDA declines to approve first drug for obesity-linked liver disease,0.0,0.0,,,,False
-25010,2020-07-23,ABT,Healthcare,5 Dividend Aristocrats Where Analysts See Capital Gains,0.34,0.34,,,,False
-49194,2021-06-25,ABBV,Healthcare,Forget Dogecoin: These Dogs of the Dow Are More Likely to Make You Rich,0.4019,0.4019,,,,False
-111876,2023-04-17,MRK,Healthcare,Merck to buy Prometheus Biosciences for about $11 bln,0.0,0.0,,,,False
-126572,2023-08-01,MRK,Healthcare,"US STOCKS SNAPSHOT-S&P 500, Nasdaq slide after mixed pharma earnings; economic data in focus",0.0,0.0,,,,False
-5866,2020-02-25,CAT,Industrials,Dow Jones Today: CDC Warning Is a Red Flag for Stocks,-0.34,-0.34,,,,False
-12229,2020-04-13,CAT,Industrials,"BUZZ-U.S. STOCKS ON THE MOVE-Netflix, Amazon.com, Dish Network, GE, AMC Entertainment, Aurora Cannabis",0.4215,0.4215,,,,False
-39161,2021-01-29,CAT,Industrials,"Caterpillar Q4 Profit Falls, But Beats Estimates - Quick Facts",0.2382,0.714,,,,False
-56873,2021-10-15,GE,Industrials,"Be Patient, General Electric Stock Won’t Stay Stuck at $100 Per Share Forever",0.0516,0.0516,,,,False
-90793,2022-09-16,UPS,Industrials,Reading Q3 Earnings Tea Leaves After the FedEx Bombshell,0.0,0.0,,,,False
-2786,2020-01-29,DOW,Materials,"Dow Jones Today Rises On Apple, Dow, Boeing; Chips Take A Hit, Fed Prepares To Vote",0.0,0.0,,,,False
-27447,2020-08-20,DOW,Materials,"Dow Movers: DOW, INTC",0.0,0.0,,,,False
-28844,2020-09-11,DOW,Materials,Canada touts plan to cut fuel carbon intensity; refiners fret about costs,-0.296,-0.296,,,,False
-84810,2022-07-20,NUE,Materials,3 Top Dividend Kings for the Second Half of 2022,0.2023,0.2023,,,,False
-113196,2023-04-25,NEM,Materials,Newmont (NEM) to Report Q1 Earnings: What's in the Offing?,0.0,0.0,,,,False
-40120,2021-02-11,PLD,RealEstate,"IYR, AMT, PLD, CCI: Large Inflows Detected at ETF",0.0,0.0,,,,False
-77022,2022-05-05,O,RealEstate,Realty Income Q1 22 Earnings Conference Call At 2:30 PM ET,0.0,0.0,,,,False
-85718,2022-07-27,PLD,RealEstate,What Do Some of My Favorite S&P 500 Stocks Have In Common? They're All REITs,0.4588,0.4588,,,,False
-106913,2023-03-02,O,RealEstate,Build Your Wealth by Buying and Holding These 2 Dividend Stocks for at Least 20 Years,0.4939,0.4939,,,,False
-114463,2023-05-03,PLD,RealEstate,RBC Capital Maintains Prologis (PLD) Outperform Recommendation,0.0,0.4215,,,,False
-1549,2020-01-17,INTC,Tech,"Technology Sector Update for 01/17/2020: AMD,INTC,SNAP,PRGS",0.0,0.0,,,,False
-71618,2022-03-18,INTC,Tech,M&A honchos try U.S. trustbusters in absentia,0.0,0.0,,,,False
-101549,2023-01-13,AMD,Tech,No Holiday PC Sales Boost for Intel and AMD,0.4939,0.4939,,,,False
-103260,2023-01-27,AMD,Tech,"Got $1,000? 5 Buffett Stocks to Buy in 2023 and Hold Forever",0.0,0.0,,,,False
-117858,2023-05-31,NVDA,Tech,Nvidia rally: Retail investors stay out on growing slowdown worries,-0.2732,-0.2732,,,,False
-3204,2020-01-31,SO,Utilities,Stocks That Hit 52-Week Highs On Friday,0.0,0.0,,,,False
-106045,2023-02-22,AEP,Utilities,"Utilities Stocks' Q4 Earnings on Feb 23: AEP, PCG & More",0.0,0.0,,,,False
-112175,2023-04-18,NEE,Utilities,Why NextEra (NEE) is Poised to Beat Earnings Estimates Again,0.25,0.6124,,,,False
-130634,2023-08-28,DUK,Utilities,"Energy Sector Update for 08/28/2023: CVX, HE, XPRO, DUK",0.2732,0.2732,,,,False
-142384,2023-11-15,SO,Utilities,"Ex-Dividend Reminder: Nuvei, Wynn Resorts and Southern",0.0,0.0,,,,False
+1425,2020-01-17,T,Comm,7 5G Stocks to Connect Your Portfolio To,0.0,0.0,neutral,3,General sector introduction with no explicit positive or negative sentiment,True
+41913,2021-03-11,TMUS,Comm,"Notable Thursday Option Activity: TMUS, LRCX, FCX",0.0,0.0,neutral,4,Reports option trading activity only; does not reflect business performance,True
+48492,2021-06-16,T,Comm,"Now That Nokia Is Free Cash Flow Positive, Prospects for a Dividend Are High",0.8442,0.8442,positive,5,Positive financial milestone and improved dividend outlook,True
+103885,2023-02-02,TMUS,Comm,T-Mobile (TMUS) Beats on Q4 Earnings Despite Lower Revenues,0.2235,0.5978,positive,4,Earnings beat is positive; revenue decline is secondary,True
+127932,2023-08-10,T,Comm,RBC Capital Maintains AT&T (T) Sector Perform Recommendation,0.0,0.0,neutral,4,Maintains existing rating; no upgrade or downgrade,True
+11505,2020-04-08,DIS,Consumer,Netflix (NFLX) Toolkit to Help Parents Clean Child Content,0.6597,0.6597,positive,3,Product improvement supports brand reputation; indirect positive impact,True
+29916,2020-09-29,DIS,Consumer,"Disney to Lay Off 28,000 Workers in Parks, Experiences, and Products Unit",0.0,0.0,negative,5,Large-scale layoffs typically signal business pressure and weakness,True
+97721,2022-11-30,WMT,Consumer,Be Mindful About Retail ETF Investing This Holiday Season,0.4019,0.4019,neutral,3,General investment advice about ETFs; no direct sentiment toward WMT,True
+104523,2023-02-08,DIS,Consumer,Commercial Metals and Ovintiv have been highlighted as Zacks Bull and Bear of the Day,0.0,0.0,neutral,4,Article discusses other companies; irrelevant to DIS with no sentiment,True
+131034,2023-08-31,WMT,Consumer,3 Takeaways from the August Inflation Report,0.0,0.0,neutral,3,Macroeconomic analysis only; no direct impact or sentiment regarding WMT,True
+22150,2020-06-16,XOM,Energy,"BUZZ-U.S. STOCKS ON THE MOVE-Eli Lilly, Turtle Beach, Eldorado Resorts",0.0,0.0,neutral,3,XOM not mentioned; neutral market recap with no sentiment,True
+61273,2021-12-13,COP,Energy,Activist group targets Exxon with shareholder climate resolution,0.0,0.0,negative,4,Activist shareholder pressure introduces regulatory and reputational risks,True
+83875,2022-07-13,OXY,Energy,"Zacks Investment Ideas feature highlights: Apple, Occidental Petroleum and HP",0.0,0.0,neutral,2,OXY is listed without any positive or negative commentary,True
+84016,2022-07-14,COP,Energy,ConocoPhillips (COP) Dips More Than Broader Markets: What You Should Know,0.0,0.0,negative,4,Underperforming market performance suggests relative weakness,True
+146107,2023-12-13,OXY,Energy,OXY August 2024 Options Begin Trading,0.0,0.0,neutral,5,New options listing is a routine event with no financial sentiment,True
+30884,2020-10-12,WFC,Financials,"S&P 500 Gains 57 Points Ahead of Earnings, Huge Apple and Amazon Events, Ford Stock Gets an Upgrade",0.6597,0.8225,neutral,3,General market news; no specific sentiment regarding WFC,True
+63401,2022-01-10,GS,Financials,Saudi Arabia's biggest lender hires banks for sustainable sukuk -document,0.0,0.0,neutral,4,Financing arrangement is a neutral corporate activity,True
+111826,2023-04-17,MS,Financials,US STOCKS-Wall St slips as Fed seen hiking rates in May; State Street sinks,0.0,0.0,negative,3,Rate-hike pressure weighs on financials; MS not specifically targeted,True
+139092,2023-10-25,V,Financials,"Visa (V) Q4 Earnings Beat on Cross-Border Volume, Dividend Hiked",0.0,0.4588,positive,5,Strong earnings and dividend increase are clear positive signals,True
+143368,2023-11-24,MS,Financials,3 Investment Banks to Watch Despite Industry-Wide Challenges,-0.0572,-0.0572,neutral,3,Observational tone; challenges noted but no explicit negative call,True
+23145,2020-06-29,GILD,Healthcare,U.S. FDA declines to approve first drug for obesity-linked liver disease,0.0,0.0,negative,5,Regulatory rejection of a drug candidate is clearly negative,True
+25010,2020-07-23,ABT,Healthcare,5 Dividend Aristocrats Where Analysts See Capital Gains,0.34,0.34,positive,4,Analyst recognition and expected capital appreciation are positive,True
+49194,2021-06-25,ABBV,Healthcare,Forget Dogecoin: These Dogs of the Dow Are More Likely to Make You Rich,0.4019,0.4019,neutral,2,Generic listing; no specific evaluation or sentiment about ABBV,True
+111876,2023-04-17,MRK,Healthcare,Merck to buy Prometheus Biosciences for about $11 bln,0.0,0.0,positive,4,Strategic acquisition strengthens pipeline; viewed positively long-term,True
+126572,2023-08-01,MRK,Healthcare,"US STOCKS SNAPSHOT-S&P 500, Nasdaq slide after mixed pharma earnings; economic data in focus",0.0,0.0,neutral,3,Broader market decline; no specific commentary on MRK performance,True
+5866,2020-02-25,CAT,Industrials,Dow Jones Today: CDC Warning Is a Red Flag for Stocks,-0.34,-0.34,negative,4,Public health warning creates market uncertainty; negative for industrials,True
+12229,2020-04-13,CAT,Industrials,"BUZZ-U.S. STOCKS ON THE MOVE-Netflix, Amazon.com, Dish Network, GE, AMC Entertainment, Aurora Cannabis",0.4215,0.4215,neutral,3,Appears on a movers list; direction and cause unspecified,True
+39161,2021-01-29,CAT,Industrials,"Caterpillar Q4 Profit Falls, But Beats Estimates - Quick Facts",0.2382,0.714,positive,4,Profit down but beat consensus; results exceed market expectations,True
+56873,2021-10-15,GE,Industrials,"Be Patient, General Electric Stock Won’t Stay Stuck at $100 Per Share Forever",0.0516,0.0516,positive,4,Implies undervaluation and future upside; positive forward view,True
+90793,2022-09-16,UPS,Industrials,Reading Q3 Earnings Tea Leaves After the FedEx Bombshell,0.0,0.0,neutral,3,Industry context; no direct assessment or sentiment on UPS,True
+2786,2020-01-29,DOW,Materials,"Dow Jones Today Rises On Apple, Dow, Boeing; Chips Take A Hit, Fed Prepares To Vote",0.0,0.0,neutral,3,Market mixed; DOW mentioned as index component; no clear sentiment,True
+27447,2020-08-20,DOW,Materials,"Dow Movers: DOW, INTC",0.0,0.0,neutral,4,Identifies price movers only; no direction or cause stated,True
+28844,2020-09-11,DOW,Materials,Canada touts plan to cut fuel carbon intensity; refiners fret about costs,-0.296,-0.296,negative,4,Stricter regulation and rising costs are negative for the industry,True
+84810,2022-07-20,NUE,Materials,3 Top Dividend Kings for the Second Half of 2022,0.2023,0.2023,positive,4,Featured as a top-quality dividend stock; positive endorsement,True
+113196,2023-04-25,NEM,Materials,Newmont (NEM) to Report Q1 Earnings: What's in the Offing?,0.0,0.0,neutral,4,"Preview before release; outcome unknown, so neutral judgment",True
+40120,2021-02-11,PLD,RealEstate,"IYR, AMT, PLD, CCI: Large Inflows Detected at ETF",0.0,0.0,positive,3,Strong capital flows into related ETFs suggest positive sentiment,True
+77022,2022-05-05,O,RealEstate,Realty Income Q1 22 Earnings Conference Call At 2:30 PM ET,0.0,0.0,neutral,5,Announces call time only; no financial or sentiment content,True
+85718,2022-07-27,PLD,RealEstate,What Do Some of My Favorite S&P 500 Stocks Have In Common? They're All REITs,0.4588,0.4588,positive,4,Author explicitly expresses personal preference; positive tone,True
+106913,2023-03-02,O,RealEstate,Build Your Wealth by Buying and Holding These 2 Dividend Stocks for at Least 20 Years,0.4939,0.4939,positive,5,Strong buy-and-hold recommendation; clearly positive assessment,True
+114463,2023-05-03,PLD,RealEstate,RBC Capital Maintains Prologis (PLD) Outperform Recommendation,0.0,0.4215,positive,5,Outperform rating is a positive recommendation maintained,True
+1549,2020-01-17,INTC,Tech,"Technology Sector Update for 01/17/2020: AMD,INTC,SNAP,PRGS",0.0,0.0,neutral,3,Sector recap only; no explicit positive or negative commentary,True
+71618,2022-03-18,INTC,Tech,M&A honchos try U.S. trustbusters in absentia,0.0,0.0,neutral,2,General regulatory discussion; no direct link or sentiment to INTC,True
+101549,2023-01-13,AMD,Tech,No Holiday PC Sales Boost for Intel and AMD,0.4939,0.4939,negative,4,Weak seasonal demand is a clear negative business signal,True
+103260,2023-01-27,AMD,Tech,"Got $1,000? 5 Buffett Stocks to Buy in 2023 and Hold Forever",0.0,0.0,neutral,2,AMD not among listed stocks; irrelevant with no sentiment,True
+117858,2023-05-31,NVDA,Tech,Nvidia rally: Retail investors stay out on growing slowdown worries,-0.2732,-0.2732,negative,5,Concerns about slowing growth are a clear negative signal,True
+3204,2020-01-31,SO,Utilities,Stocks That Hit 52-Week Highs On Friday,0.0,0.0,positive,4,New price high typically reflects market confidence and positive momentum,True
+106045,2023-02-22,AEP,Utilities,"Utilities Stocks' Q4 Earnings on Feb 23: AEP, PCG & More",0.0,0.0,neutral,5,Upcoming earnings announcement; no performance assessment yet,True
+112175,2023-04-18,NEE,Utilities,Why NextEra (NEE) is Poised to Beat Earnings Estimates Again,0.25,0.6124,positive,5,Confident forecast of earnings beat is clearly positive,True
+130634,2023-08-28,DUK,Utilities,"Energy Sector Update for 08/28/2023: CVX, HE, XPRO, DUK",0.2732,0.2732,neutral,3,Market update; no specific sentiment regarding DUK,True
+142384,2023-11-15,SO,Utilities,"Ex-Dividend Reminder: Nuvei, Wynn Resorts and Southern",0.0,0.0,neutral,5,Administrative reminder; dividend event is financially neutral,True

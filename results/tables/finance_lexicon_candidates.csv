@@ -1,25 +1,25 @@
-term,score,rationale,review_status
-beat,2.0,Results above expectations are positive.,AI candidate - student review required
-beats,2.0,Inflected form of an expectations beat.,AI candidate - student review required
-miss,-2.0,Results below expectations are negative.,AI candidate - student review required
-misses,-2.0,Inflected form of an expectations miss.,AI candidate - student review required
-upgrade,2.2,An analyst/rating upgrade is favourable.,AI candidate - student review required
-upgraded,2.2,Past-tense analyst/rating upgrade.,AI candidate - student review required
-downgrade,-2.2,An analyst/rating downgrade is adverse.,AI candidate - student review required
-downgraded,-2.2,Past-tense analyst/rating downgrade.,AI candidate - student review required
-outperform,1.8,Positive relative-performance rating.,AI candidate - student review required
-outperforms,1.8,Positive relative-performance outcome.,AI candidate - student review required
-underperform,-1.8,Negative relative-performance rating.,AI candidate - student review required
-underperforms,-1.8,Negative relative-performance outcome.,AI candidate - student review required
-bullish,2.0,Explicit positive market direction.,AI candidate - student review required
-bearish,-2.0,Explicit negative market direction.,AI candidate - student review required
-buyback,1.5,Repurchase announcements often support value per share.,AI candidate - student review required
-buybacks,1.5,Plural form of share repurchase.,AI candidate - student review required
-surges,2.3,Large positive price/operating move.,AI candidate - student review required
-plunges,-2.5,Large negative price/operating move.,AI candidate - student review required
-selloff,-2.2,Broad or security-specific selling pressure.,AI candidate - student review required
-bankruptcy,-3.2,Severe financial distress event.,AI candidate - student review required
-bankrupt,-3.2,Severe financial distress condition.,AI candidate - student review required
-insolvency,-3.0,Inability to meet financial obligations.,AI candidate - student review required
-delisting,-2.5,Loss or threatened loss of exchange listing.,AI candidate - student review required
-slashes,-2.2,"Strong downward revision to guidance, jobs or payout.",AI candidate - student review required
+term,score,rationale,review_status,final_decision,final_valence
+beat,2.0,Results exceed expectations; positive signal.,Reviewed,Accept,Positive
+beats,2.0,Third-person/plural form of beat; results beat expectations.,Reviewed,Accept,Positive
+miss,-2.0,Results fall short of expectations; negative signal.,Reviewed,Accept,Negative
+misses,-2.0,Third-person/plural form of miss; results miss expectations.,Reviewed,Accept,Negative
+upgrade,2.2,Analyst/rating upgrade; generally favourable for asset prices.,Reviewed,Accept,Positive
+upgraded,2.2,Past tense/participle of upgrade; rating has been raised.,Reviewed,Accept,Positive
+downgrade,-2.2,Analyst/rating downgrade; generally adverse for asset prices.,Reviewed,Accept,Negative
+downgraded,-2.2,Past tense/participle of downgrade; rating has been lowered.,Reviewed,Accept,Negative
+outperform,1.8,Performs better than benchmark/market; positive rating.,Reviewed,Accept,Positive
+outperforms,1.8,Third-person form of outperform; beats benchmark.,Reviewed,Accept,Positive
+underperform,-1.8,Performs worse than benchmark/market; negative rating.,Reviewed,Accept,Negative
+underperforms,-1.8,Third-person form of underperform; lags benchmark.,Reviewed,Accept,Negative
+bullish,2.0,Expresses positive market outlook; clearly favourable.,Reviewed,Accept,Positive
+bearish,-2.0,Expresses negative market outlook; clearly adverse.,Reviewed,Accept,Negative
+buyback,1.5,"Share repurchase signals confidence and supports value; occasionally driven by other motives, but broadly positive.",Reviewed,Accept,Positive
+buybacks,1.5,Plural form of buyback; multiple or ongoing repurchases.,Reviewed,Accept,Positive
+surges,2.3,Sharp rise in price or operating metrics; strongly positive.,Reviewed,Accept,Positive
+plunges,-2.5,"Sharp, steep drop in price or results; strongly negative.",Reviewed,Accept,Negative
+selloff,-2.2,Broad or concentrated selling pressure leading to price falls; negative.,Reviewed,Accept,Negative
+bankruptcy,-3.2,Legal state of insolvency; extreme negative event.,Reviewed,Accept,Negative
+bankrupt,-3.2,Financially insolvent; unable to pay debts; severe distress.,Reviewed,Accept,Negative
+insolvency,-3.0,"Inability to meet financial obligations; severe distress, slightly less severe than bankruptcy.",Reviewed,Accept,Negative
+delisting,-2.5,Removal or threatened removal from exchange listing; major negative.,Reviewed,Accept,Negative
+slashes,-2.2,"Deep cuts to guidance, workforce, or payouts; clearly adverse.",Reviewed,Accept,Negative

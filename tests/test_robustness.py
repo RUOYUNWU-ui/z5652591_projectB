@@ -10,7 +10,7 @@ import pandas as pd
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from src.portfolios import oos_backtest  # noqa: E402
+from src.portfolios import oos_backtest, simulate_rebalanced_portfolio  # noqa: E402
 from src.robustness import (  # noqa: E402
     evaluate_covariance_shrinkage,
     transaction_cost_sensitivity,
@@ -68,7 +68,32 @@ def test_transaction_costs_are_deterministic_and_reduce_growth() -> None:
     assert sensitivity.loc[sensitivity["cost_bps"].eq(100), "growth_drag_vs_gross"].iat[0] < 0
 
 
+def test_holdings_drift_and_pre_trade_turnover_are_exact() -> None:
+    dates = pd.bdate_range("2023-01-02", periods=4)
+    returns = pd.DataFrame(
+        {"A": [0.10, 0.00, 0.00, 0.00], "B": [0.00, 0.00, 0.00, 0.00]},
+        index=dates,
+    )
+    targets = pd.DataFrame(
+        {"A": [0.5, 0.5], "B": [0.5, 0.5]}, index=dates[[0, 2]]
+    )
+    portfolio, pre_trade, turnover = simulate_rebalanced_portfolio(returns, targets)
+    assert np.isclose(portfolio.iloc[0], 0.05)
+    assert np.isclose(pre_trade.loc[dates[2], "A"], 1.1 / 2.1)
+    expected = 0.5 * (abs(0.5 - 1.1 / 2.1) + abs(0.5 - 1.0 / 2.1))
+    assert np.isclose(turnover.loc[dates[2]], expected)
+
+
+def test_equal_weight_turnover_includes_drift() -> None:
+    baseline = oos_backtest(_panel("equity"), "equal_weight")
+    turnover = baseline["audit"]["turnover"].iloc[1:]
+    assert turnover.gt(0).any()
+    assert np.isclose(baseline["metrics"]["turnover"], turnover.mean())
+
+
 if __name__ == "__main__":
     test_ledoit_wolf_is_separate_and_lookahead_safe()
     test_transaction_costs_are_deterministic_and_reduce_growth()
+    test_holdings_drift_and_pre_trade_turnover_are_exact()
+    test_equal_weight_turnover_includes_drift()
     print("covariance shrinkage and transaction-cost robustness: PASS")

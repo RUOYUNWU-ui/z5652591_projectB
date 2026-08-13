@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import argparse
 import pathlib
+import shutil
 import sys
+import tempfile
 
 import numpy as np
 import pandas as pd
@@ -11,6 +13,7 @@ import pandas as pd
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+import scripts.run_part_b as runner  # noqa: E402
 from src.sentiment import (  # noqa: E402
     compare_vader_models,
     ensure_vader_lexicon,
@@ -37,6 +40,41 @@ def test_no_news_and_lag_are_explicit() -> None:
     assert np.isnan(middle["sentiment"])
     assert middle["sentiment_lag1"] == 0.4
     assert np.isnan(final["sentiment_lag1"])
+
+
+def test_manual_review_annotations_survive_clean_rebuild(monkeypatch) -> None:
+    local_tmp_root = ROOT / "tmp"
+    local_tmp_root.mkdir(parents=True, exist_ok=True)
+    tmp_path = pathlib.Path(tempfile.mkdtemp(prefix="review_test_", dir=local_tmp_root))
+    template_path = tmp_path / "results" / "sentiment_manual_review_template.csv"
+    backup_path = tmp_path / "report" / "sentiment_manual_review_annotations.json"
+    template_path.parent.mkdir(parents=True)
+    sample = pd.DataFrame(
+        [{
+            "headline_id": 7, "date": "2023-01-03", "ticker": "AAA",
+            "sector": "Tech", "title": "AAA beats expectations",
+            "plain_score": 0.0, "enhanced_score": 0.5,
+        }]
+    )
+    completed = sample.assign(
+        student_label="positive", student_confidence=5,
+        student_notes="Human judgement", review_complete=True,
+    )
+    completed.to_csv(template_path, index=False)
+    monkeypatch.setattr(runner, "MANUAL_REVIEW_TEMPLATE", template_path)
+    monkeypatch.setattr(runner, "MANUAL_REVIEW_BACKUP", backup_path)
+
+    try:
+        first = runner._prepare_manual_review_template(sample)
+        assert backup_path.exists()
+        assert first.loc[0, "student_label"] == "positive"
+        template_path.unlink()
+        restored = runner._prepare_manual_review_template(sample)
+        assert restored.loc[0, "student_label"] == "positive"
+        assert int(restored.loc[0, "student_confidence"]) == 5
+        assert runner._truthy(restored.loc[0, "review_complete"])
+    finally:
+        shutil.rmtree(tmp_path, ignore_errors=True)
 
 
 def verify_real_data() -> None:

@@ -8,6 +8,11 @@ from __future__ import annotations
 import pathlib
 import sys
 
+import matplotlib
+
+# The deployed dashboard renders charts to Streamlit rather than opening GUI
+# windows. Agg is thread-safe for AppTest and headless Streamlit hosting.
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd

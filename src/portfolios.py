@@ -341,6 +341,99 @@ def _monthly_rebalance_dates(matrix: pd.DataFrame, initial_window: int) -> list[
     return [date for date in first_per_month if matrix.index.get_loc(date) + 1 < len(matrix)]
 
 
+def simulate_rebalanced_portfolio(
+    asset_returns: pd.DataFrame,
+    target_weights: pd.DataFrame,
+) -> tuple[pd.Series, pd.DataFrame, pd.Series]:
+    """Apply a target-weight schedule while allowing holdings to drift daily.
+
+    Parameters
+    ----------
+    asset_returns
+        Complete date-by-ticker simple-return matrix.
+    target_weights
+        Date-by-ticker target weights indexed by the dates on which trades are
+        effective.
+
+    Returns
+    -------
+    tuple
+        Daily portfolio returns, pre-trade weights observed on each rebalance
+        date, and one-way turnover ``0.5 * sum(abs(target - pre_trade))``.
+
+    Notes
+    -----
+    A target is applied at the start of its effective date. Between those
+    dates, end-of-day holdings drift with each asset's realised return. Initial
+    funding is assigned zero turnover because it is not a rebalance from an
+    existing portfolio.
+    """
+    matrix = asset_returns.copy().sort_index().sort_index(axis=1)
+    schedule = target_weights.copy().sort_index().reindex(columns=matrix.columns)
+    if matrix.empty or schedule.empty:
+        raise ValueError("asset_returns and target_weights must be non-empty")
+    if matrix.index.has_duplicates or schedule.index.has_duplicates:
+        raise ValueError("return and target-weight dates must be unique")
+    if schedule.isna().any().any():
+        raise ValueError("target_weights and asset_returns tickers do not match")
+    if (schedule < -1e-12).any().any():
+        raise ValueError("target_weights must be long-only")
+    if not np.allclose(schedule.sum(axis=1).to_numpy(), 1.0, atol=1e-8):
+        raise ValueError("target_weights must sum to one on every rebalance date")
+
+    live = matrix.loc[schedule.index.min():]
+    if live.empty or not schedule.index.isin(live.index).all():
+        raise ValueError("Every target-weight date must exist in asset_returns")
+    if live.isna().any().any():
+        raise ValueError("asset_returns must be complete during the live period")
+
+    current_end_weights: pd.Series | None = None
+    portfolio_returns: list[float] = []
+    return_dates: list[pd.Timestamp] = []
+    pre_trade_rows: list[pd.Series] = []
+    turnover_values: list[float] = []
+
+    for date, realised in live.iterrows():
+        if date in schedule.index:
+            target = schedule.loc[date].astype("float64")
+            if current_end_weights is None:
+                # Initial funding is not counted as a post-launch trade.
+                pre_trade = target.copy()
+                turnover = 0.0
+            else:
+                pre_trade = current_end_weights.copy()
+                turnover = 0.5 * float((target - pre_trade).abs().sum())
+            pre_trade.name = date
+            pre_trade_rows.append(pre_trade)
+            turnover_values.append(turnover)
+            start_weights = target
+        else:
+            if current_end_weights is None:
+                raise RuntimeError("No target weights are live on the first OOS date")
+            start_weights = current_end_weights
+
+        realised = realised.astype("float64")
+        daily_return = float(start_weights @ realised)
+        gross_value = 1.0 + daily_return
+        if not np.isfinite(gross_value) or gross_value <= 0:
+            raise RuntimeError("Portfolio value became non-positive during weight drift")
+        current_end_weights = start_weights.mul(1.0 + realised).div(gross_value)
+        if not np.isfinite(current_end_weights.to_numpy()).all():
+            raise RuntimeError("Weight drift produced non-finite holdings")
+        current_end_weights = current_end_weights / current_end_weights.sum()
+        return_dates.append(date)
+        portfolio_returns.append(daily_return)
+
+    pre_trade_weights = pd.DataFrame(pre_trade_rows).reindex(
+        index=schedule.index, columns=schedule.columns
+    )
+    turnover = pd.Series(turnover_values, index=schedule.index, name="turnover")
+    returns = pd.Series(
+        portfolio_returns, index=pd.DatetimeIndex(return_dates), name="daily_return"
+    )
+    return returns, pre_trade_weights, turnover
+
+
 def oos_backtest(
     returns: pd.DataFrame,
     method: str = "min_variance",
@@ -386,7 +479,6 @@ def oos_backtest(
         raise ValueError("No usable monthly rebalance date after the initial window")
 
     schedules: list[dict[str, Any]] = []
-    weight_rows: list[dict[str, Any]] = []
     audit_rows: list[dict[str, Any]] = []
     previous: np.ndarray | None = None
 
@@ -412,29 +504,36 @@ def oos_backtest(
                 "n_estimation_observations": len(history),
             }
         )
-        for ticker, weight in zip(matrix.columns, weights):
-            meta = metadata.loc[ticker]
-            weight_rows.append(
-                {
-                    "rebalance_date": rebalance_date,
-                    "effective_date": effective_date,
-                    "estimation_end": history.index.max(),
-                    "ticker": ticker,
-                    "asset_class": meta.get("asset_class", pd.NA),
-                    "sector": meta.get("sector", pd.NA),
-                    "weight": float(weight),
-                }
-            )
-
     weight_schedule = pd.DataFrame(
         [dict(effective_date=s["effective_date"], **dict(zip(matrix.columns, s["weights"])))
          for s in schedules]
     ).set_index("effective_date")
-    live_matrix = matrix.loc[weight_schedule.index.min():]
-    daily_weights = weight_schedule.reindex(live_matrix.index).ffill()
-    if daily_weights.isna().any().any():
-        raise RuntimeError("Weight schedule does not cover every OOS return date")
-    portfolio_return = (live_matrix * daily_weights).sum(axis=1)
+    portfolio_return, pre_trade_schedule, turnover_series = (
+        simulate_rebalanced_portfolio(matrix, weight_schedule)
+    )
+
+    weight_rows: list[dict[str, Any]] = []
+    audit_by_effective = {row["effective_date"]: row for row in audit_rows}
+    for effective_date, target in weight_schedule.iterrows():
+        pre_trade = pre_trade_schedule.loc[effective_date]
+        turnover = float(turnover_series.loc[effective_date])
+        audit_by_effective[effective_date]["turnover"] = turnover
+        for ticker in matrix.columns:
+            meta = metadata.loc[ticker]
+            weight_rows.append(
+                {
+                    "rebalance_date": audit_by_effective[effective_date]["rebalance_date"],
+                    "effective_date": effective_date,
+                    "estimation_end": audit_by_effective[effective_date]["estimation_end"],
+                    "ticker": ticker,
+                    "asset_class": meta.get("asset_class", pd.NA),
+                    "sector": meta.get("sector", pd.NA),
+                    "pre_trade_weight": float(pre_trade.loc[ticker]),
+                    "weight": float(target.loc[ticker]),
+                    "trade_weight_change": float(target.loc[ticker] - pre_trade.loc[ticker]),
+                    "rebalance_turnover": turnover,
+                }
+            )
     growth = (1.0 + portfolio_return).cumprod()
     drawdown = growth.div(growth.cummax()).sub(1.0)
     daily_output = pd.DataFrame(
@@ -448,12 +547,11 @@ def oos_backtest(
 
     weights_output = pd.DataFrame(weight_rows)
     audit_output = pd.DataFrame(audit_rows)
-    pivot_weights = weights_output.pivot(
-        index="effective_date", columns="ticker", values="weight"
-    )
-    turnover_series = pivot_weights.diff().abs().sum(axis=1).mul(0.5).iloc[1:]
     metrics = performance_metrics(portfolio_return, spec.periods_per_year)
-    metrics["turnover"] = float(turnover_series.mean()) if not turnover_series.empty else 0.0
+    post_launch_turnover = turnover_series.iloc[1:]
+    metrics["turnover"] = (
+        float(post_launch_turnover.mean()) if not post_launch_turnover.empty else 0.0
+    )
 
     # Invariants are checked here so a bad optimiser cannot silently feed the
     # report or app. Detailed cross-method checks live in test_no_lookahead.py.
@@ -462,6 +560,9 @@ def oos_backtest(
         raise RuntimeError("Portfolio weights do not sum to one")
     if (weights_output["weight"] < -1e-12).any():
         raise RuntimeError("Portfolio contains a negative weight")
+    pre_trade_sums = weights_output.groupby("effective_date")["pre_trade_weight"].sum()
+    if not np.allclose(pre_trade_sums.to_numpy(), 1.0, atol=1e-8):
+        raise RuntimeError("Pre-trade portfolio weights do not sum to one")
     if not (audit_output["estimation_end"] < audit_output["effective_date"]).all():
         raise RuntimeError("Look-ahead invariant failed: estimation_end >= effective_date")
 

@@ -291,3 +291,67 @@ The expanded suite passed **10 tests**. The separate real-data no-look-ahead
 test passed all 12 funds and 36 rebalances per fund. After deleting generated
 Python caches, `scripts/check_handin.py` passed **23 checks with zero warnings
 and zero failures**.
+
+## Addendum - 2026-08-14: manual-review and turnover correction
+
+This addendum supersedes only the implementation/result claims in the preceding
+addendum; the earlier record is retained rather than rewritten. The student has
+now completed all 50 headline labels and reviewed all 24 finance-lexicon terms.
+`run_part_b.py` first preserves the human-only fields in
+`report/sentiment_manual_review_annotations.json`, identified by headline ID and
+title hash, then restores them into a fresh generated sample. A deliberate clean
+test deleted the entire `results/` directory: the rebuild restored 50/50 complete
+labels, regenerated the validation CSV, and retained 24/24 reviewed and accepted
+lexicon decisions. Human agreement is 66% for plain VADER and 70% for enhanced
+VADER; positive agreement rises from 66.7% to 80.0%, while negative agreement
+remains 33.3%.
+
+The backtest implementation was corrected from daily constant-target weights to
+monthly target weights that drift with realised asset returns. At each effective
+rebalance, turnover is now `0.5 * sum(abs(target - pre_trade))`; initial funding
+is zero turnover. The same drift mechanics apply to fusion variants. This changes
+baseline returns, weights, metrics, shrinkage comparisons and transaction-cost
+curves, so the prior hash-preservation statement is no longer applicable. It is
+an implementation correction, not a parameter or method change. For example,
+equity equal-weight now has 2.77% mean monthly turnover and equity maximum-Sharpe
+has 13.67%; equal-weight turnover is no longer incorrectly zero.
+
+The clean rebuild now produces exactly 28 files: 7 data CSVs, 9 figures and 12
+tables (the extra table is the completed manual-review validation). No previously
+tracked file under `results/` is absent from a fresh build. The new required-file
+SHA-256 values are:
+
+- `fund_returns.csv`: `FEF0173069875F3ADE3A39F1B2B48DD07E251B69AB0AB68CB43C4B1F87ADD5B9`;
+- `fund_weights.csv`: `A8816F630EF53D27FD3AC2290504AD792871DC0F7ED8934ECE0F7D4A6BEF5048`;
+- `sector_sentiment_index.csv`: `0EE9F1613A76F3047B8947A6535E040FC1F9E382770F55E205A599C79CBA6482`;
+- `performance_metrics.csv`: `AD0C051AE09320844F14853B90FB61B0D048B68C62CCD585E550EC3F3EFE2658`.
+
+The report generator now describes the actual sector-level tilt and interprets
+Figures A1-A8 in the narrative, including the completed human validation. The
+14-page DOCX was regenerated, rendered page by page, and visually checked; the
+matching PDF was replaced from that render. The full suite now passes **13
+tests** in one command. Setting Matplotlib to the non-GUI Agg backend removed a
+Windows/Python 3.14 teardown failure without skipping any app test. The separate
+real-data audit again passed all 12 funds and 36 rebalances per fund. After cache
+cleanup, `scripts/check_handin.py` passed **23 checks with zero warnings and zero
+failures**. `src/data_access.py` remains byte-for-byte untouched.
+
+## Addendum - 2026-08-14: final report and hand-in consistency
+
+The student-edited report was checked against the Part B rubric and the supplied
+UNSW cover reference. The cover was adapted for FINS5545 and an individual
+submission; a required fusion before/after table was added; all Figures A1-A8
+and Tables 1-5, A1 and B1 are referenced and interpreted in the narrative; and
+the references use Harvard author-date form. The 14-page DOCX/PDF was rendered
+page by page and checked for clipping, missing images, table overflow, headers,
+footers and page numbering. The written narrative occupies seven pages and is
+below the brief's ten-page maximum.
+
+To protect the student's final manual edits, `scripts/build_report.py` now writes
+`report/report_generated_draft.docx` instead of overwriting
+`report/report.docx`. The README, submission checklist and completion matrix now
+reflect the final 28-file build, completed 50-headline and 24-term reviews, six
+app pages and public repository
+`https://github.com/RUOYUNWU-ui/z5652591_projectB`. The only unverified course
+deliverable is the browser-authenticated live Streamlit URL; it must be opened in
+a logged-out browser and submitted with the public repository and Moodle zip.

@@ -19,3 +19,5 @@ data/
 .env
 .idea/
 tmp/
+outputs/
+report/report_generated_draft.docx

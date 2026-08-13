@@ -1,17 +1,15 @@
 # Student manual sentiment review
 
-This is the only remaining evidence step that must be completed by the student,
-because the project brief requires the written interpretation to be the
-student's own and an AI-generated label would not be an independent manual
-check.
+The student completed this evidence step on 2026-08-14. The saved labels remain
+independent human judgements; the model scores are retained only for comparison.
 
-## File to complete
+## Completed file
 
 Open `results/tables/sentiment_manual_review_template.csv`. It contains 50
 headlines sampled reproducibly at five per equity sector. Do not change the
 headline, score, ID, date, ticker, or sector columns.
 
-For every row, complete:
+Every row contains:
 
 - `student_label`: exactly `negative`, `neutral`, or `positive`.
 - `student_confidence`: an integer from 1 (uncertain) to 5 (very certain).
@@ -30,12 +28,14 @@ From the project root, run:
 python scripts/validate_sentiment_review.py
 ```
 
-The validator refuses partial or invalid labels. When all 50 rows are complete,
-it writes `results/tables/sentiment_manual_review_validation.csv`, comparing
-human agreement with plain and finance-enhanced VADER. Interpret that result in
-your own words in the final report; do not claim the enhanced model is better
-unless the completed evidence supports it.
+The validator refuses partial or invalid labels. The completed review writes
+`results/tables/sentiment_manual_review_validation.csv`, comparing human
+agreement with plain and finance-enhanced VADER. The observed overall agreement
+is 66% for plain VADER and 70% for enhanced VADER; this modest gain and the weak
+negative-class agreement are both reported rather than presenting a blanket
+accuracy claim.
 
-Keep the completed template and validation CSV in the submission. Re-running
-`scripts/run_part_b.py` recreates a blank template, so make a backup before a
-clean rebuild.
+Keep the completed template and validation CSV in the submission. Before writing
+the generated template, `scripts/run_part_b.py` now saves the human-only fields
+to `report/sentiment_manual_review_annotations.json`. A clean rebuild restores
+the labels from that file and re-runs validation, preventing accidental loss.

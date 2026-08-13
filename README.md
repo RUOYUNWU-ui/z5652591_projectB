@@ -7,7 +7,7 @@ public GitHub repository; the app entrypoint is streamlit_app.py at the root.
 
     pip install -r requirements.txt -r requirements-dev.txt
     python scripts/run_part_b.py            # reproduces your results into results/
-    python scripts/build_report.py           # rebuilds report/report.docx
+    python scripts/build_report.py           # optional draft; does not overwrite the final report
     python scripts/validate_sentiment_review.py  # after student labels 50 headlines
     streamlit run streamlit_app.py          # runs the app locally
 
@@ -53,8 +53,14 @@ PROJECT_BRIEF.md Appendix D and docs/STUDENT_DEPLOY.md (in this folder). In shor
     # commit your precomputed app artifacts under results/ (the app reads them)
     # commit and push the precomputed artifacts
 
-The current build repository is private. At hand-in, the student must make it
-PUBLIC, confirm the live Streamlit app, submit both URLs, and upload the zipped
-project folder to Moodle. The student must also complete the 50-headline review
-described in `report/MANUAL_SENTIMENT_REVIEW.md` and rewrite the final report
-interpretation in their own voice.
+The public repository is:
+
+    https://github.com/RUOYUNWU-ui/z5652591_projectB
+
+The 50-headline and 24-term reviews are complete and preserved by the build.
+The final student-edited report is `report/report.docx`, with the submission PDF
+at `report/report.pdf`. `scripts/build_report.py` intentionally writes
+`report/report_generated_draft.docx` so a reproducible AI/evidence draft cannot
+overwrite the student's final Word source. Before hand-in, confirm the live
+Streamlit URL in a logged-out browser, submit both URLs, and upload the final zip
+to Moodle.

@@ -12,35 +12,35 @@ import numpy as np
 import pandas as pd
 
 
-# AI-proposed first draft for the student's manual review. Scores use VADER's
-# usual -4..+4 valence range. This is a small, explainable finance extension,
-# motivated by the Loughran-McDonald finding that domain context matters; it is
-# not a copy of their full proprietary/research dictionary.
+# AI proposed the initial terms and scores; the student reviewed and accepted
+# all 24 entries on 2026-08-14, revising the rationales below. Scores use
+# VADER's usual -4..+4 valence range. This is a small, explainable finance
+# extension, not a copy of the full Loughran-McDonald dictionary.
 FINANCE_LEXICON_CANDIDATES: tuple[dict[str, object], ...] = (
-    {"term": "beat", "score": 2.0, "rationale": "Results above expectations are positive."},
-    {"term": "beats", "score": 2.0, "rationale": "Inflected form of an expectations beat."},
-    {"term": "miss", "score": -2.0, "rationale": "Results below expectations are negative."},
-    {"term": "misses", "score": -2.0, "rationale": "Inflected form of an expectations miss."},
-    {"term": "upgrade", "score": 2.2, "rationale": "An analyst/rating upgrade is favourable."},
-    {"term": "upgraded", "score": 2.2, "rationale": "Past-tense analyst/rating upgrade."},
-    {"term": "downgrade", "score": -2.2, "rationale": "An analyst/rating downgrade is adverse."},
-    {"term": "downgraded", "score": -2.2, "rationale": "Past-tense analyst/rating downgrade."},
-    {"term": "outperform", "score": 1.8, "rationale": "Positive relative-performance rating."},
-    {"term": "outperforms", "score": 1.8, "rationale": "Positive relative-performance outcome."},
-    {"term": "underperform", "score": -1.8, "rationale": "Negative relative-performance rating."},
-    {"term": "underperforms", "score": -1.8, "rationale": "Negative relative-performance outcome."},
-    {"term": "bullish", "score": 2.0, "rationale": "Explicit positive market direction."},
-    {"term": "bearish", "score": -2.0, "rationale": "Explicit negative market direction."},
-    {"term": "buyback", "score": 1.5, "rationale": "Repurchase announcements often support value per share."},
-    {"term": "buybacks", "score": 1.5, "rationale": "Plural form of share repurchase."},
-    {"term": "surges", "score": 2.3, "rationale": "Large positive price/operating move."},
-    {"term": "plunges", "score": -2.5, "rationale": "Large negative price/operating move."},
-    {"term": "selloff", "score": -2.2, "rationale": "Broad or security-specific selling pressure."},
-    {"term": "bankruptcy", "score": -3.2, "rationale": "Severe financial distress event."},
-    {"term": "bankrupt", "score": -3.2, "rationale": "Severe financial distress condition."},
-    {"term": "insolvency", "score": -3.0, "rationale": "Inability to meet financial obligations."},
-    {"term": "delisting", "score": -2.5, "rationale": "Loss or threatened loss of exchange listing."},
-    {"term": "slashes", "score": -2.2, "rationale": "Strong downward revision to guidance, jobs or payout."},
+    {"term": "beat", "score": 2.0, "rationale": "Results exceed expectations; positive signal.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Positive"},
+    {"term": "beats", "score": 2.0, "rationale": "Third-person/plural form of beat; results beat expectations.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Positive"},
+    {"term": "miss", "score": -2.0, "rationale": "Results fall short of expectations; negative signal.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "misses", "score": -2.0, "rationale": "Third-person/plural form of miss; results miss expectations.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "upgrade", "score": 2.2, "rationale": "Analyst/rating upgrade; generally favourable for asset prices.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Positive"},
+    {"term": "upgraded", "score": 2.2, "rationale": "Past tense/participle of upgrade; rating has been raised.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Positive"},
+    {"term": "downgrade", "score": -2.2, "rationale": "Analyst/rating downgrade; generally adverse for asset prices.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "downgraded", "score": -2.2, "rationale": "Past tense/participle of downgrade; rating has been lowered.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "outperform", "score": 1.8, "rationale": "Performs better than benchmark/market; positive rating.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Positive"},
+    {"term": "outperforms", "score": 1.8, "rationale": "Third-person form of outperform; beats benchmark.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Positive"},
+    {"term": "underperform", "score": -1.8, "rationale": "Performs worse than benchmark/market; negative rating.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "underperforms", "score": -1.8, "rationale": "Third-person form of underperform; lags benchmark.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "bullish", "score": 2.0, "rationale": "Expresses positive market outlook; clearly favourable.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Positive"},
+    {"term": "bearish", "score": -2.0, "rationale": "Expresses negative market outlook; clearly adverse.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "buyback", "score": 1.5, "rationale": "Share repurchase signals confidence and supports value; occasionally driven by other motives, but broadly positive.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Positive"},
+    {"term": "buybacks", "score": 1.5, "rationale": "Plural form of buyback; multiple or ongoing repurchases.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Positive"},
+    {"term": "surges", "score": 2.3, "rationale": "Sharp rise in price or operating metrics; strongly positive.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Positive"},
+    {"term": "plunges", "score": -2.5, "rationale": "Sharp, steep drop in price or results; strongly negative.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "selloff", "score": -2.2, "rationale": "Broad or concentrated selling pressure leading to price falls; negative.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "bankruptcy", "score": -3.2, "rationale": "Legal state of insolvency; extreme negative event.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "bankrupt", "score": -3.2, "rationale": "Financially insolvent; unable to pay debts; severe distress.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "insolvency", "score": -3.0, "rationale": "Inability to meet financial obligations; severe distress, slightly less severe than bankruptcy.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "delisting", "score": -2.5, "rationale": "Removal or threatened removal from exchange listing; major negative.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
+    {"term": "slashes", "score": -2.2, "rationale": "Deep cuts to guidance, workforce, or payouts; clearly adverse.", "review_status": "Reviewed", "final_decision": "Accept", "final_valence": "Negative"},
 )
 
 FINANCE_LEXICON = {
@@ -50,10 +50,8 @@ FINANCE_LEXICON = {
 
 
 def finance_lexicon_table() -> pd.DataFrame:
-    """Return the candidate lexicon with rationales and an audit status."""
-    table = pd.DataFrame(FINANCE_LEXICON_CANDIDATES)
-    table["review_status"] = "AI candidate - student review required"
-    return table
+    """Return the student-reviewed finance lexicon and audit decisions."""
+    return pd.DataFrame(FINANCE_LEXICON_CANDIDATES)
 
 
 def ensure_vader_lexicon(download: bool = False) -> None:

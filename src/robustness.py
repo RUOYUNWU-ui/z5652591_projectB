@@ -106,18 +106,22 @@ def evaluate_covariance_shrinkage(
 
 
 def _rebalance_turnover(weights: pd.DataFrame) -> pd.Series:
-    required = {"effective_date", "ticker", "weight"}
+    required = {"effective_date", "ticker", "weight", "pre_trade_weight"}
     missing = required - set(weights.columns)
     if missing:
         raise ValueError(f"weights missing required columns: {sorted(missing)}")
     frame = weights.copy()
     frame["effective_date"] = pd.to_datetime(frame["effective_date"])
-    matrix = frame.pivot(index="effective_date", columns="ticker", values="weight")
-    matrix = matrix.sort_index().fillna(0.0)
-    turnover = matrix.diff().abs().sum(axis=1).mul(0.5)
-    # The sensitivity measures rebalancing costs after launch; initial funding
-    # from cash is not treated as a strategy turnover event.
-    turnover.iloc[0] = 0.0
+    target = frame.pivot(index="effective_date", columns="ticker", values="weight")
+    pre_trade = frame.pivot(
+        index="effective_date", columns="ticker", values="pre_trade_weight"
+    )
+    target = target.sort_index().fillna(0.0)
+    pre_trade = pre_trade.reindex_like(target).fillna(0.0)
+    # This compares the drifted portfolio immediately before each monthly
+    # rebalance with the new target, rather than comparing successive targets.
+    turnover = target.sub(pre_trade).abs().sum(axis=1).mul(0.5)
+    turnover.iloc[0] = 0.0  # initial funding is not a rebalance cost event
     return turnover
 
 
@@ -148,7 +152,8 @@ def transaction_cost_sensitivity(
 
         for cost_bps in levels:
             cost_rate = aligned_turnover * (cost_bps / 10_000.0)
-            net_return = daily["daily_return"] - cost_rate
+            # Deduct costs before earning that effective date's gross return.
+            net_return = (1.0 - cost_rate).mul(1.0 + daily["daily_return"]).sub(1.0)
             metrics = performance_metrics(net_return, ppy)
             net_growth = float((1.0 + net_return).prod())
             rows.append(

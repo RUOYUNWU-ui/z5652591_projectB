@@ -1,471 +1,548 @@
-# Prompt log - Part B (z5652591)
+# Prompt log - FINS5545 Project B (z5652591)
 
-Dated entries, most recent first. Template: `ai/prompt_log_template.md`.
+This log follows the five-field structure in the provided
+`ai/prompt_log_template.md`. It records what I asked an AI assistant to do,
+what it produced, the risks or errors I identified, and the changes I made
+after checking the output against the course material, source code, tests and
+generated evidence. The prompts are grouped by task so the record remains
+readable; they are not presented as work completed without human review.
 
----
-
-## 2026-08-14 - Reproducibility correction and crypto-gap investigation
-
-### What I wanted
-Make the reproducibility claim literal for the complete committed `results/`
-tree, correct the stale post-Prompt-8 sentence in the QA report, and investigate
-the crypto/reference Sharpe gap without changing the frozen model.
-
-### What the agent produced
-An actual build from a deleted `results/` directory generated exactly 21 files.
-Comparing that manifest with `git ls-files results` identified six tracked-only
-files: three obsolete per-variant fusion CSVs and three `.gitkeep` placeholders.
-All six were removed; the current combined `fusion_returns.csv` is the sole
-canonical variant return file. No clean-build output was absent from Git.
-Two independent clean builds then matched by SHA-256 for all 21 generated
-files, including figures and supporting tables, not merely the four marker
-files.
-
-The diagnostic printed all 36 equity and crypto rebalance dates and observation
-counts, recomputed the ridge at every decision, verified the published crypto
-return moments, and recorded the full findings in `report/QA_REPORT.md`.
-
-### What was wrong or risky
-The earlier reproducibility check proved only the four required CSV hashes and
-did not compare the complete tracked result manifest. Consequently, it missed
-orphaned files that a fresh checkout could retain after an in-place build but a
-truly empty build would never create. The QA report also retained a sentence
-written before Prompt 8 saying Git had not been initialised, even after the
-private push occurred.
-
-The requested full `pytest tests/` run initially could not start because
-`pytest` was not declared in `requirements-dev.txt`. I added `pytest>=8,<10`,
-kept it out of deployment requirements, and reran successfully: 8 tests passed.
-
-The crypto Sharpe gap looked superficially like it might be caused by covariance
-scaling. It is not: the ridge is exactly `1e-8` of average variance in every
-equity and crypto window, the absolute floor never binds, crypto covariance is
-better conditioned than equity covariance, and equal weight—where no covariance
-is used—shows the gap too. The exact 252/365 calendars and expanding counts are
-also correct. The underlying crypto moments reproduce at 0.2226734509% mean and
-5.1994728333% daily standard deviation.
-
-### What I changed and why
-Only stale artifacts and documentation were changed; no return, window,
-annualisation, optimiser, regularisation, or fusion parameter changed. The
-remaining lecture difference is documented as unexplained rather than tuned
-away. GitHub identity was checked read-only: `RUOYUNWU-ui/desktop-tutorial`,
-private, default branch `main`. Repository renaming and visibility were not
-changed.
-
----
-
-## 2026-08-13 - Codex Prompt 8: private release preparation
+## 1. Project setup - reuse Part A and freeze assumptions before coding (13 August 2026)
 
 ### What I wanted
-Publish the reviewed project and its precomputed `results/` artifacts to the
-student-confirmed GitHub target while keeping the repository private and
-excluding raw data, local caches, and secrets.
 
-### What the agent produced
-The student chose the existing `RUOYUNWU-ui/desktop-tutorial` repository and
-explicitly authorised replacement of its old contents. GitHub CLI verified the
-authenticated account as `RUOYUNWU-ui`, repository visibility as `PRIVATE`,
-and permission as `ADMIN`. The release uses one reviewed local `main` commit
-and a protected replacement push tied to the previously observed remote commit,
-so a concurrent remote change causes a stop instead of an accidental overwrite.
-
-### What was wrong or risky
-The first repository name proposed in the roadmap was not the repository the
-student ultimately selected. The selected repository already contained a
-tutorial commit and was initially observable anonymously, so pushing before
-the student made it private would have violated the frozen deployment rule.
-The first GitHub CLI download was also a standalone executable, not a graphical
-app; double-clicking it only displayed a command-line explanation. I used its
-explicit local path, required browser authentication, and re-checked visibility
-before any write.
-
-### What I changed and why
-No model result was changed. Release housekeeping removes regenerated Python
-caches, repeats the official checker and raw-data/secret gates, and commits the
-entire confirmed project scope including `results/`. The agent does not connect
-Streamlit Cloud and does not make the repository public; both remain student
-actions.
-
----
-
-## 2026-08-13 - Codex Prompt 7: final QA and submission scan
-
-### What I wanted
-Prove the project is reproducible, run real-data acceptance tests, compare the
-fund results only directionally with the Week 10 worked example, run the
-official hand-in checker, and remove caches/local clutter without touching the
-frozen data loader or fitting parameters to the reference result.
-
-### What the agent produced
-- Repeated the clean rebuild test. The four core marker/app CSVs reproduced
-  exactly, including row counts and SHA-256 hashes.
-- Passed the smoke, all-12-fund no-look-ahead, sentiment, and fusion real-data
-  tests. The tests explicitly cover weight timing, full investment,
-  non-negativity, distinct optimisers, no-news handling, signal lagging, and
-  lambda-zero equivalence.
-- Added `tests/test_streamlit_app.py` so the five-page and invalid-allocation
-  checks remain reproducible rather than existing only as a temporary QA run.
-- Read and visually checked the Week 10 worked-example pages, then wrote the
-  actual-versus-reference comparison to `report/QA_REPORT.md`.
-- Removed generated Python caches, the copied IDE folder, and temporary PDF
-  inspection files. Extended `.gitignore` for `.pytest_cache/`, `.idea/`, and
-  `tmp/`.
-- Ran the official checker: 22 checks passed, zero failures, one report
-  reminder.
-
-### What was wrong or risky
-The first smoke/real-data invocation ran inside a network-restricted sandbox.
-The smoke script catches data errors by design, so it printed a skip message
-while still returning status zero; the real-data test then failed loudly on
-the same connection restriction. Treating the smoke exit code alone as proof
-would have been misleading. I reran with explicit temporary access to the
-course's public ZIP and obtained `data load OK` plus all real-data passes.
-
-The actual crypto Sharpe ratios are materially below the Week 10 worked
-example, and crypto does not beat equity for all four methods. This is a real
-sanity-check flag, not something to hide. The combined and equity results are
-mostly close to the reference, minimum variance is lowest-volatility in every
-family, and every timing/annualisation/constraint test passes. I therefore did
-not reverse-engineer weights or parameters to force the desired ranking.
-
-The hand-in checker still warns that `report/report.pdf` is absent. I did not
-manufacture the student's economic interpretation: the brief explicitly says
-that analysis must be in the student's own words.
-
-### What I changed and why
-Only housekeeping and documentation changed during QA. Model choices and
-numeric parameters were left unchanged. Git was not initialised and nothing
-was pushed, because the prompt makes those actions conditional on explicit
-student confirmation.
-
----
-
-## 2026-08-13 - Codex Prompts 5-6: reproducible artifacts and five-page app
-
-### What I wanted
-Create one official end-to-end build that writes the four exact marker/app
-CSVs, all required exhibits and fact-sheet data, then replace the starter app
-with a five-page investor journey that reads only those precomputed artifacts.
-
-### What the assistant produced
-`scripts/run_part_b.py` now rebuilds the Part A foundation, all 12 funds, both
-sentiment models, fixed fusion variants, current holdings, a backtest audit,
-manual lexicon review files, a market-wide 0-100 context index and seven
-self-contained exhibits. It writes 10,392 fund-return rows, 17,280 fund-weight
-rows, 20,120 sector-model sentiment rows, 12 performance rows, 480 current
-holdings rows and 2,256 fusion-return rows. `streamlit_app.py` provides Home,
-Fund Comparison, Fund Fact Sheet, Allocation Builder and Sentiment Analytics.
-
-### What was wrong or risky
-Visual QA found the performance-table fund-name column clipping longer labels;
-the minimum-variance equity and combined drawdown series also overlap almost
-exactly, making one line hard to see. The first server smoke-test wrapper used
-a PowerShell process-launch path that failed because the host environment
-contained duplicate case-insensitive Path/PATH keys; the app itself had not
-started in that attempt. A second wrapper reached the health endpoint but its
-unsupported process-kill overload caused only the wrapper to time out.
-
-### What I changed and why
-The first table column was widened and the overlapping combined drawdown line
-made dashed without changing data. App verification was separated from wrapper
-behaviour: Streamlit's AppTest opened all five pages with zero exceptions, and
-an intentionally invalid allocation (76.67%) produced the required warning
-rather than a crash. A real local Streamlit health request returned HTTP 200
-and body `ok`; no listener remained afterward. Static search confirmed the app
-contains no nltk, data_access, raw-loader, optimiser, backtest or scoring call.
-
-For reproducibility, every generated file under `results/` except `.gitkeep`
-was removed after validating the resolved target path, and the official script
-was rerun from zero outputs. All four core CSVs matched the first build exactly
-by both row count and SHA-256: fund_returns 10,392; fund_weights 17,280;
-sector_sentiment_index 20,120; performance_metrics 12.
-
----
-
-## 2026-08-13 - Codex Prompt 4: lag-safe sentiment fusion
-
-### What I wanted
-Apply the course formula to the minimum-variance equity fund using a sector
-signal that is at least one trading day old, verify `lambda=0` exactly matches
-the base, and retain fixed `lambda=+1/-1` results without selecting the winner
-after seeing the OOS period.
-
-### What the assistant produced
-Codex implemented `apply_sentiment()` with the multiplicative rule, zero clip,
-and equity-target renormalisation; crypto/non-equity weights remain unchanged.
-It also implemented schedule-based return reconstruction and a fixed three-way
-base/momentum/contrarian evaluator. A 60-trading-day rolling standardisation
-window with 20 minimum observations was fixed before viewing fusion results,
-as an untuned approximately one-quarter history. Missing signals produce no
-tilt (`z=0`) while remaining flagged as unavailable.
-
-### What was wrong or risky
-The frozen text did not name a numerical z-score window. Treating it as a
-parameter to search over the full OOS period would create the exact tuning
-leakage the course warns about. Also, `rebalance_date` (base estimator close)
-and `effective_date` (actual trade date) needed to be distinguished explicitly:
-a Monday headline is valid for Tuesday's effective weights, not Monday's.
-
-### What I changed and why
-The 60/20 setting and both lambda signs were frozen without a search. The code
-stores `sentiment_source_date` and asserts it is strictly earlier than
-`effective_date`; the first source was 2021-01-04 and first tilted effective
-date 2021-01-05. `lambda=0` passed exact row equality; all tilted rows remain
-long-only and sum to one. Untuned real-data results were kept as observed:
-base growth 1.2222, annual return 6.96%, vol 12.79%, Sharpe 0.590, max drawdown
--18.31%; momentum growth 1.2528, return 7.84%, vol 13.63%, Sharpe 0.622,
-drawdown -20.38%; contrarian growth 1.3294, return 10.01%, vol 14.11%, Sharpe
-0.747, drawdown -16.75%. These are results, not parameters used to re-pick a
-sign or window.
-
----
-
-## 2026-08-13 - Codex Prompt 3: plain and finance-enhanced VADER
-
-### What I wanted
-Build the plain-VADER baseline, a small explainable finance-lexicon extension,
-equal-weight ticker sector indices, explicit no-news rows, a one-trading-day
-lag, and a stratified manual-review sample without altering Part A's raw title
-text.
-
-### What the assistant produced
-Codex implemented per-headline and ticker-day scoring, sector-index assembly,
-VADER build-resource validation, a 24-term finance candidate table with scores
-and rationales, and a plain-vs-enhanced comparison helper. The same scoring
-path is used for both models; only the optional lexicon argument changes.
-`tests/test_sentiment.py` verifies no-news/neutral separation and produces the
-required real-data comparison and 5-headline-per-sector review sample.
-
-### What was wrong or risky
-The first real-data comparison assumed mapped `(date, ticker, sector, title)`
-was unique. It is not: headlines were correctly deduplicated on original
-publication date in Part A, but distinct weekend/holiday observations can map
-to the same trading day and share the same mapped key. Re-deduplicating would
-have thrown away valid observations.
-
-### What I changed and why
-Each exploded title now receives a stable `headline_id`, used only to align its
-plain and enhanced scores. No mapped row is deleted. Real-data checks then
-passed: 2,847 original duplicates removed, 6 post-calendar rows removed,
-37,962 headline-panel groups, all 10 sectors, and 456 explicit sector-model
-no-news rows. Plain VADER's headline neutral rate was 49.573657%; the enhanced
-candidate lexicon reduced it to 47.809031% (-1.7646 percentage points). The
-manual-review CSV has exactly 50 rows (5 per sector). The lexicon remains marked
-"AI candidate - student review required" rather than being presented as a
-completed human judgement.
-
----
-
-## 2026-08-13 - Codex Prompt 2: 12-fund walk-forward OOS engine
-
-### What I wanted
-Implement the frozen 3 asset families x 4 methods matrix in
-`src/portfolios.py`, with expanding-window monthly re-estimation, weights
-effective on the next trading day, explicit 252/365 conventions, no exposure
-caps, and machine-checkable no-look-ahead evidence.
-
-### What the assistant produced
-Codex implemented `performance_metrics()` and `oos_backtest()` for equal
-weight, minimum variance, maximum Sharpe and risk parity. The result retains
-`rebalance_date`, `effective_date`, and `estimation_end`, and returns daily OOS
-returns, growth of one dollar, drawdown, long-format weights, audit rows,
-turnover and the frozen spec. It also added `tests/test_no_lookahead.py`, with
-synthetic and hosted-real-data verification modes.
-
-### What was wrong or risky
-Two issues were found by running the tests rather than trusting the draft.
-First, the initial risk-parity auxiliary variable was incorrectly normalised
-to sum to one before minimising the log-barrier risk-budgeting objective; this
-caused an L-BFGS-B line-search failure. Second, the first monthly schedule was
-initially formed by grouping only the post-window eligible tail, which made
-2020-12-31 look like December's "first" trading date and produced 37 instead
-of the expected 36 rebalances.
-
-### What I changed and why
-Risk parity now starts at the natural KKT scale
-`sqrt(risk_budget / asset_variance)` and fails loudly if optimisation does not
-converge. Monthly dates are now determined from the full trading calendar and
-then filtered for estimation-window eligibility. The real-data rerun passed:
-all 12 funds have 36 rebalances; equity/combined first OOS date is 2021-01-05,
-crypto first OOS date is 2021-01-02; maximum weight-sum error is at most
-4.44e-16; all weights are non-negative; every estimation end precedes its
-effective date; and all six method pairs within every asset family have
-different weight matrices (smallest reported maximum absolute difference was
-0.018578, combined equal-weight vs risk-parity).
-
----
-
-## 2026-08-13 - Correct frozen spec against the course's own reference solution
-
-### What I wanted
-Before writing (or generating, via Codex) any Station 3 code, check my
-already-frozen `report/OUTLINE.md` backtest spec against
-`week10_revision_fins5545.pdf` - the course's own "Agentic Coding and
-Revision" lecture, which walks through a complete worked reference
-implementation ("Overfit Capital") on the identical 2020-2023 dataset. I
-asked Claude Code to read it and tell me where my spec disagreed.
-
-### What the assistant produced
-Two real disagreements, not just style differences:
-1. My fund matrix was 3 asset families x 3 methods (Equal-Weight,
-   Minimum-Variance, Risk Parity), with Maximum-Sharpe/tangency parked as an
-   optional "stretch" method. The reference lecture builds all 4 methods
-   (adding Maximum-Sharpe) x 3 universes = 12 funds as its *baseline*, with
-   exact optimisation formulas given on slide 9. Since the lecture is public
-   course material, an AI prompt can already reproduce a 3-method version
-   trivially - shipping only 3 would read as *below* the demonstrated
-   baseline, not as innovation.
-2. My spec had TBD single-asset (20%) and combined-fund crypto (30%) weight
-   caps, picked by me as a sensible-sounding default with no real evidence
-   behind the specific numbers. The reference runs fully unconstrained and
-   explicitly reports the resulting concentration as a finding (minimum-
-   variance settling near 34% healthcare / near-zero crypto, "because
-   minimising variance avoids the most volatile assets") - the concentration
-   *is* the result to explain, not something to cap away by construction.
-
-### What was wrong or risky
-If I had briefed Codex to build the 3-method, capped version without ever
-checking this lecture, I would have shipped a materially weaker "baseline"
-than the one the marker demonstrated in their own revision session, and
-hidden the exact concentration pattern the reference treats as a key
-economic finding - not a coding bug, but a scope/design mistake that AI
-would not have caught on its own since neither version is "wrong code."
-
-### What I changed and why
-Updated `report/OUTLINE.md`: fund matrix now 3x4=12 (added Maximum-Sharpe,
-with its formula, to the required set, not stretch); removed the two TBD
-caps and switched the baseline default to unconstrained long-only/fully-
-invested, matching the reference, with a capped/constrained variant kept
-available as an optional *labelled* extra sensitivity check rather than the
-default. Also replaced my vague "bounded +-20% tilt" fusion description with
-the reference's own precise formula (rolling z-score of lagged sentiment,
-`w_tilde = w_base * (1 + lambda * z)`, clip-and-renormalise), and added the
-reference's discovery-window/holdout-window tuning discipline (it shows a
-tuned tilt scoring 0.84 in the window it was chosen on and 0.08 on the next
-untouched year - exactly the overfitting trap the brief and my own earlier
-`CLAUDE.md` rule already warned against, now with a concrete methodology to
-follow instead of just "don't tune to the test period"). Left the Codex
-prompt pack (`projectB_codex_prompts.md`, kept outside the submitted project
-folder, in my own scratch space) to be rewritten against this corrected spec
-before I hand any of it to Codex.
-
----
-
-## 2026-08-13 - Project setup: port Part A modules, freeze backtest spec
-
-### What I wanted
-Stand up the Part B project from `projectB_starter.zip` (already unzipped into
-this folder), reuse the parts of my completed Part A project that Part B is
-allowed to reuse (per the brief's "Academic integrity" clause and my own
-`PROJECT_B_ROADMAP.md`), and freeze the backtest/model assumptions before
-writing any Station 3 code.
+Build Part B on my completed Part A foundation, reusing only the modules
+permitted by the brief. Before portfolio or sentiment code was written, I
+wanted the estimation windows, rebalance schedule, constraints, annualisation
+rules and sentiment lag recorded so they could not be adjusted after seeing
+results.
 
 ### Prompt(s)
-Asked Claude Code to (1) implement "step 1" of the roadmap now that the
-`z5652591_projectB` folder existed, using my own completed Part A project as
-the source for reusable modules, and (2) cross-check the roadmap against the
-official `project_brief_FINS5545.pdf` and `project_overview.pdf` before acting.
+
+> "Port the Part A data loading, cleaning, calendar-merging and feature modules
+> unchanged into this Part B project, but do not overwrite the starter
+> `src/data_access.py`."
+
+> "Read the official project brief and project structure documents. Compare my
+> plan against them line by line and flag mismatches in filenames, folder
+> layout, fund matrix, rules and deliverables."
+
+> "Write the frozen assumptions in the outline: universes, methods, initial
+> windows, rebalance frequency, weight timing, long-only constraints,
+> risk-free rate, baseline transaction costs, annualisation days, sentiment
+> lag, and the rule that Part A full-sample statistics must not influence Part
+> B weights."
 
 ### What the assistant produced
-- Read the official brief PDF and compared it against my own
-  `PROJECT_B_ROADMAP.md`; confirmed no conflicts (required filenames, fund
-  matrix, backtest rules, report structure, `check_handin.py` behaviour all
-  matched). Flagged one folder-path difference (`fins-agent/fins2026/...`
-  from the brief vs. my flat `FINS5545/z5652591_projectB` layout) as worth a
-  sanity check, not a fix, since Part A was already submitted that way.
-- Extracted my completed `z5652591_projectA.zip` and diffed
-  `src/data_access.py` against the Part B starter's copy - byte-identical, so
-  `etl.py`, `calendar_merge.py`, and `features.py` are safe to port unchanged
-  (same interface, same frozen data source).
-- Copied `calendar_merge.py`, `plot_style.py`, `innovation.py` (new files) and
-  overwrote the stub `etl.py` and `features.py` with my completed Part A
-  versions. Did **not** touch `src/data_access.py` (kept the Part B starter's
-  copy, per the roadmap's explicit warning not to overwrite it).
-- Installed `requirements.txt` + `requirements-dev.txt` (only `nltk` was
-  missing locally) and ran `tests/test_smoke.py` - passed, data loads.
-- Ran an end-to-end check of every ported module
-  (`etl` -> `calendar_merge` -> `features` -> `plot_style` -> `innovation`)
-  against the live hosted data inside this project (not assumed numbers).
-- Drafted `CLAUDE.md` and `AGENTS.md` (both were still the unedited
-  placeholder - `check_handin.py` fails until at least one is replaced).
-- Added a "Backtest & model assumptions (fixed before coding)" section to
-  `report/OUTLINE.md`: fund matrix (3 asset families x 3 methods), 252/365
-  estimation windows, monthly rebalance, long-only/fully-invested, rf=0,
-  costs=0, 252 vs 365 annualisation, sentiment lag >= 1 trading day, fusion
-  scope (equity-only, bounded, renormalised), and an explicit rule that Part
-  A's full-sample attention-volatility correlation (0.21) may only motivate a
-  hypothesis, never backfill historical weights.
+
+The assistant confirmed that the starter `src/data_access.py` was byte-for-byte
+identical to the supplied loader used in Part A and left it untouched. It
+ported my completed Part A `etl.py`, `calendar_merge.py`, `features.py`,
+`plot_style.py` and `innovation.py`, then ran the pipeline against the official
+data. The checks reproduced 50,300 clean equity rows, 14,610 clean crypto rows
+after removing the ten 2024 observations, 146,830 deduplicated headlines and a
+37,962-row ticker-day headline panel. It also added the frozen assumptions to
+`report/OUTLINE.md` and documented the no-look-ahead restriction.
+
+The assistant identified one non-code layout difference: the brief illustrates
+`fins-agent/fins2026/z5652591_projectB`, whereas my repository is located at
+`D:\新南威尔士 UNSW\T2\FINS5545\FINS 5545 CODEX\z5652591_projectB`.
+The code uses project-relative paths, so this location difference does not
+change the calculations.
 
 ### What was wrong or risky
-None of the ported code needed correction - the end-to-end check reproduced
-Part A's exact published numbers on the first run:
-- equities clean: 50,300 rows, 0 duplicates, 192 outlier candidates
-- crypto clean: 14,610 rows, 10 rows dropped (post-2023-12-31), 60 outliers
-- combined return panel: 60,360 rows
-- news: 146,830 rows after dropping 2,847 duplicates and 6 unmappable rows
-- headline panel: 37,962 (trading_day, ticker, sector) rows
 
-This matched `PROJECT_A_COMPLETE_DOCUMENTATION.md` exactly, so no correction
-was needed here - the risk this step was actually guarding against (silently
-reusing a *different* or *stale* version of the Part A logic) did not
-materialise, but it was verified rather than assumed.
-
-One real risk I did have to catch: my own initial framing conflated "copy
-Part A's report/results" with "copy Part A's *code*" - the brief and roadmap
-both only permit reusing the latter; full-sample Part A statistics (e.g. the
-attention-volatility correlation) must not feed OOS weights. That rule is now
-written into both `CLAUDE.md`/`AGENTS.md` and `report/OUTLINE.md` so it isn't
-relitigated later under results pressure.
+The main risk was confusing permission to reuse my Part A code with permission
+to reuse Part A full-sample results. If a Part B rebalance used a mean,
+covariance or sentiment baseline calculated over all of 2020-2023, that
+statistic would include information dated after the historical decision. The
+code could still run and produce plausible Sharpe ratios, so this form of
+look-ahead would not necessarily reveal itself as a software error. Two
+proposed exposure caps were also still unresolved at this stage; silently
+accepting an AI-suggested default would have violated the purpose of freezing
+the design before observing performance.
 
 ### What I changed and why
-No code changes needed beyond the port itself. Two placeholders that are
-genuinely unresolved and must not be silently defaulted: the single-asset
-weight cap and the combined-fund crypto-exposure cap, both left as `TBD` in
-`report/OUTLINE.md` to be set explicitly (and recorded here) when
-`src/portfolios.py` is drafted, rather than picked implicitly by whatever the
-optimiser happens to do.
+
+I checked the reproduced row counts against my submitted Part A evidence rather
+than relying only on the assistant's summary. I kept the starter data loader,
+recorded the full-sample restriction in `CLAUDE.md`, `AGENTS.md` and
+`report/OUTLINE.md`, and required the later no-look-ahead tests to enforce it.
+I left the proposed caps unresolved until I compared the specification with
+the course reference in the next task instead of allowing them to become
+implicit defaults.
 
 ---
 
-## 2026-08-14 - Robustness lab and editable report draft
+## 2. Check the backtest specification against the course reference (13 August 2026)
 
-### What I asked
+### What I wanted
 
-I asked Codex to complete the grade-raising work already recommended: add an
-untuned covariance-shrinkage check, a transaction-cost sensitivity curve,
-integrate both into reproducible outputs and the app, prepare the required
-manual sentiment-review workflow, draft the Part B report, verify everything,
-and keep the GitHub repository private while building.
+Before implementation, compare my planned portfolio specification with the
+Week 10 worked example so that differences in scope, formulas and constraints
+were resolved before results existed.
+
+### Prompt(s)
+
+> "Read the worked example in the course revision lecture. Compare my planned
+> specification line by line: universes, methods, formulas, constraints,
+> timing and reporting. Tell me exactly where they differ."
+
+> "Where the plans disagree, explain both alternatives and the likely effect
+> on the results. Do not choose silently on my behalf."
 
 ### What the assistant produced
 
-- Added a separate robustness module. The default optimiser still uses sample
-  covariance; Ledoit-Wolf is explicitly selected only for the extension.
-- Added 0/10/25/50/100 bps cost curves based on realised rebalance turnover.
-- Added tests confirming the default sample-covariance path is unchanged,
-  shrinkage uses the same OOS schedule, and higher costs reduce ending wealth.
-- Added three CSV outputs, two figures, and a sixth Streamlit page called
-  `Robustness Lab`, all based on precomputed artifacts.
-- Added a reproducible 50-headline review template and a strict validator. The
-  assistant did not fabricate student labels.
-- Generated `report.docx` and `report.pdf`, then rendered and visually reviewed
-  all 14 pages. The report identifies itself as an AI-assisted draft and leaves
-  final economic wording and human sentiment labels to me.
+The comparison identified two material differences. My original outline had
+three methods, while the reference used four methods across three universes,
+giving 12 funds. My outline also proposed 20% single-asset and 30% crypto caps
+without empirical or course support, whereas the reference used long-only,
+fully invested portfolios without those caps and treated concentration as an
+economic result to interpret. The assistant also extracted the reference
+fusion rule: multiply base weights by `1 + lambda * z_score`, clip at zero and
+renormalise.
 
 ### What was wrong or risky
 
-The first local rebuild could not download the frozen data bundle because the
-execution sandbox blocked network access. It was rerun with explicit network
-permission; `src/data_access.py` was not changed. The first report render found
-that the references spilled as two isolated items onto a mostly blank final
-page and that the transaction-cost discussion referred to Figure A9 although
-the exhibit was A8. References were moved to their own page and the figure
-number was corrected before the final render.
+A three-method capped implementation would not necessarily contain a coding
+error, but it would be narrower than the baseline demonstrated by the course
+and would suppress the concentration pattern that the reference treats as a
+finding. This was therefore a scope and research-design problem rather than a
+syntax problem. Once performance results existed, changing the methods or caps
+would also create a risk of selecting a specification because it produced a
+more attractive backtest.
 
-### What I must still do myself
+### What I changed and why
 
-I must label the 50 sampled headlines, run the validator, verify and rewrite
-the report's economic interpretation in my own voice, and make the repository
-public only at hand-in. These are student-authorship and account decisions, not
-tasks that should be silently automated or misrepresented as complete.
+I changed the frozen baseline to three universes by four methods: equal weight,
+minimum variance, maximum Sharpe and risk parity. I removed the arbitrary caps
+and retained long-only, fully invested constraints. Any future capped version
+would have to be labelled as a separate sensitivity check rather than replacing
+the baseline. I also replaced the vague fusion description with the course
+formula and recorded that its window and lambda values had to be chosen before
+viewing the fusion results.
+
+---
+
+## 3. Implement the 12-fund walk-forward backtest (13 August 2026)
+
+### What I wanted
+
+Implement expanding-window, monthly rebalanced equity, crypto and combined
+funds with weights effective on the next trading day, plus an audit trail and
+tests that mechanically detect timing and constraint failures.
+
+### Prompt(s)
+
+> "Implement equal weight, minimum variance, maximum Sharpe and risk parity.
+> Every portfolio must be long-only and fully invested."
+
+> "Estimation ends on the rebalance decision date and weights become effective
+> on the next available trading day. Keep `estimation_end`, `rebalance_date`
+> and `effective_date` separate so the timing can be audited."
+
+> "Use at least 252 observations for equity and combined funds and 365 calendar
+> observations for crypto. Annualise equity/combined with 252 and crypto with
+> 365."
+
+> "Add tests for strict date ordering, weights summing to one, non-negative
+> weights, the expected number of monthly decisions and different allocations
+> across the four methods."
+
+### What the assistant produced
+
+The assistant implemented the four methods in `src/portfolios.py`, a shared OOS
+backtest, performance metrics, long-format weights and a rebalance audit. The
+real-data run produced all 12 funds with 36 monthly decisions per fund. The
+first live dates were 5 January 2021 for equity and combined funds and 2 January
+2021 for crypto. Tests used an absolute tolerance of `1e-8` for full investment
+and `-1e-12` as the numerical lower bound for non-negative weights; estimation
+always ended before the effective date.
+
+### What was wrong or risky
+
+Two silent implementation errors appeared during testing. First, the initial
+risk-parity solver scale was normalised incorrectly before the log-barrier
+risk-budgeting optimisation, causing an L-BFGS-B line-search failure. A solver
+returning a plausible vector is not enough evidence that it solved the intended
+economic problem. Second, the first schedule grouped only the eligible tail of
+the calendar. This treated 31 December 2020 as December's first eligible date
+and produced 37 decisions instead of the expected 36. Both errors could have
+produced reasonable-looking output without an explicit audit.
+
+### What I changed and why
+
+I checked the risk-parity objective and changed its starting scale to
+`sqrt(risk_budget / asset_variance)`, then required the optimiser to fail loudly
+if it did not converge. I changed the schedule logic to find each month's first
+date from the complete calendar and only then apply estimation-window
+eligibility. I manually checked the expected 36 months and reran the real-data
+test. All 12 funds then had 36 rebalances, weight sums were within machine
+precision, all weights were non-negative, every estimation end preceded its
+effective date, and every pair of methods within an asset family had different
+weight matrices.
+
+---
+
+## 4. Build plain and finance-enhanced VADER sentiment models (13-14 August 2026)
+
+### What I wanted
+
+Build comparable plain and finance-enhanced VADER models using one scoring
+pipeline, create a sector-level daily sentiment index with a strict trading-day
+lag, and prepare genuinely blank human-review material rather than allowing the
+AI to validate its own labels.
+
+### Prompt(s)
+
+> "Score every headline individually and aggregate ticker-day scores to a daily
+> sector index. Preserve original title casing and punctuation."
+
+> "Build plain and finance-enhanced VADER through the same pipeline so only the
+> reviewed finance lexicon changes."
+
+> "Map headlines to the trading calendar and require at least a one-trading-day
+> lag before sentiment can influence weights. Keep no-news days different from
+> neutral-news days."
+
+> "Prepare 24 candidate finance terms marked `student review required` and
+> exactly 50 blank headline-review rows, five per sector. Do not fill in the
+> student decisions."
+
+### What the assistant produced
+
+The assistant implemented per-headline scoring, ticker-day aggregation,
+equal-weight sector aggregation, explicit no-news rows and plain-versus-enhanced
+comparison. It created a 24-term candidate lexicon and a stratified 50-headline
+review file with the student fields blank. On 146,830 deduplicated headlines,
+the enhanced lexicon reduced the neutral classification rate from 49.573657%
+to 47.809031%, a decrease of 1.7646 percentage points. The same pipeline and
+thresholds were used for both models.
+
+### What was wrong or risky
+
+An early comparison assumed that mapped `(date, ticker, sector, title)` rows
+were unique. They are not: distinct headlines published on weekends or
+holidays can map to the same trading day and may share the mapped key. Removing
+them after calendar mapping would discard valid observations. There was also a
+timing risk: rolling a weekend headline to Monday is only date alignment, not
+the trading lag. Using that value for Monday's position would still use
+same-effective-day information. Finally, AI-generated lexicon explanations and
+model labels could not be presented as human validation.
+
+### What I changed and why
+
+I retained the Part A exact-duplicate rule `(ticker, original date, title)` but
+did not deduplicate distinct rows again after trading-day mapping. Each retained
+headline received a stable `headline_id` for aligning plain and enhanced scores.
+The mapped observation date and usable signal date were separated: weekend news
+first maps to Monday and can influence Tuesday's effective position, not
+Monday's. I then personally completed all 50 headline judgements and reviewed
+all 24 finance terms. Those human-only fields are preserved in
+`report/sentiment_manual_review_annotations.json` and restored after a clean
+build. The completed validation reports 66% agreement for plain VADER and 70%
+for enhanced VADER; positive agreement rises from 66.7% to 80.0%, while
+negative agreement remains 33.3%. I kept this mixed result instead of claiming
+that the enhanced model was generally accurate.
+
+---
+
+## 5. Add lag-safe sentiment fusion without tuning to OOS results (13 August 2026)
+
+### What I wanted
+
+Test a sector-level sentiment tilt on the equity minimum-variance fund while
+fixing all signal parameters and directions before viewing results. The zero
+tilt had to reproduce the base fund exactly.
+
+### Prompt(s)
+
+> "Apply the sentiment tilt to the equity minimum-variance portfolio. Every
+> stock inherits its sector's lagged z-score. Use `weight * (1 + lambda *
+> z_score)`, clip negative values and renormalise."
+
+> "Fix lambda at 0, +1 and -1. Do not search for better values and do not remove
+> an underperforming variant."
+
+> "Fix the rolling z-score window before viewing results. If sentiment is
+> unavailable, use zero tilt and retain an availability flag."
+
+> "Verify that lambda zero reproduces the base weights exactly. If it does not,
+> treat that as an implementation error."
+
+### What the assistant produced
+
+The assistant implemented base (`lambda=0`), momentum (`lambda=+1`) and
+contrarian (`lambda=-1`) variants using a 60-trading-day standardisation window
+with 20 minimum observations. Missing signals produce zero tilt and remain
+flagged as unavailable. The implementation records `sentiment_source_date` and
+requires it to be earlier than `effective_date`. The lambda-zero case passed
+exact row equality with the base minimum-variance weights, and every tilted
+portfolio remained long-only and fully invested.
+
+### What was wrong or risky
+
+The main risk was research integrity rather than a software exception. Searching
+over window lengths or signs during the OOS period and retaining only the winner
+would convert noise mining into an apparently successful strategy. The
+lambda-zero invariant was also essential: if renormalisation changed the zero
+case, performance differences could not be attributed to sentiment. A further
+wording risk was calling the implementation ticker-level; the signal is
+sector-level because all stocks in a sector receive the same lagged z-score.
+
+### What I changed and why
+
+I froze the 60/20 window and all three lambda values without a parameter search,
+kept all three results side by side, and updated the outline, report and app to
+describe a sector-level tilt. The final drift-corrected OOS results are reported
+without changing the specification: Sharpe ratios are 0.591 for the base,
+0.630 for momentum and 0.741 for contrarian. Contrarian performing best is
+described as one pre-specified outcome, not as proof that the sign was selected
+correctly or will persist.
+
+---
+
+## 6. Add covariance shrinkage and transaction-cost robustness checks (14 August 2026)
+
+### What I wanted
+
+Add Ledoit-Wolf covariance shrinkage and transaction-cost sensitivity as
+labelled extensions, while calculating monthly turnover from the holdings that
+actually drift between rebalances rather than from successive target vectors.
+
+### Prompt(s)
+
+> "Run Ledoit-Wolf covariance shrinkage alongside sample covariance; do not
+> silently replace the baseline estimator. Use the same expanding windows and
+> OOS dates."
+
+> "Apply one-way costs of 0, 10, 25, 50 and 100 basis points. Calculate turnover
+> from drifted pre-trade weights to the new monthly target."
+
+> "Keep the method choices and parameters fixed. If correcting portfolio drift
+> changes previously generated numbers, document the change rather than trying
+> to preserve an obsolete result."
+
+### What the assistant produced
+
+The assistant added a separate robustness module, shrinkage comparison table,
+transaction-cost curves, two figures and a sixth Streamlit page. Sample
+covariance remains the baseline and Ledoit-Wolf is an explicitly selected
+extension. It also added daily holdings drift and records pre-trade weight,
+target weight, trade change and one-way turnover at every effective rebalance.
+The same holdings mechanics are used for the base, robustness and fusion
+portfolios.
+
+### What was wrong or risky
+
+The earlier return engine effectively returned to target weights every day,
+and turnover was derived from consecutive targets. In reality, relative asset
+returns move the holdings away from target between monthly rebalances. Measuring
+the next trade from the previous target understates turnover and transaction
+costs, most visibly for equal weight, where an incorrect implementation can
+suggest zero turnover. Preserving the earlier hashes after finding this error
+would have been misleading because those hashes represented the wrong
+implementation.
+
+### What I changed and why
+
+I required holdings to drift with realised returns and calculated turnover as
+`0.5 * sum(abs(target_weight - pre_trade_weight))`; initial funding is assigned
+zero turnover. I added tests that reproduce the drift and turnover algebra on a
+small deterministic example and confirm non-zero equal-weight turnover. This
+implementation correction changed baseline returns, weights, fusion results,
+shrinkage comparisons and cost curves, but it did not change a model parameter
+or optimisation method. The report therefore uses only the regenerated,
+drift-corrected results and explains that even simple target allocations incur
+implementation costs.
+
+---
+
+## 7. Reproducibility, testing and submission checks (14 August 2026)
+
+### What I wanted
+
+Establish that the final outputs are recreated by the single official script,
+remove stale committed results, run the real-data timing audit and official
+hand-in checker, and distinguish a public repository from a verified live app.
+
+### Prompt(s)
+
+> "Compare every tracked file under `results/` with the manifest produced by a
+> clean `python scripts/run_part_b.py` run. Remove orphaned results that a clean
+> build does not reproduce."
+
+> "Run the full tests, the real-data no-look-ahead audit and
+> `scripts/check_handin.py`. Report failures and warnings rather than silently
+> changing parameters or results."
+
+> "Check that no raw data, credentials or unnecessary cache files are committed.
+> Confirm the exact repository owner/name, visibility and default branch."
+
+### What the assistant produced
+
+The first broad comparison found stale files from an earlier pipeline version
+and removed those orphaned generated artifacts from version control. After the
+human-review preservation and holdings-drift corrections, a clean
+`scripts/run_part_b.py` build produced exactly 28 files: seven data CSVs, nine
+figures and 12 tables. No tracked result was absent from the clean manifest.
+The final test suite passed 13 tests, and the separate real-data audit passed
+all 12 funds and 36 decisions per fund. At the recorded clean-hand-in checkpoint,
+`scripts/check_handin.py` passed 23 checks with no warnings after generated
+Python caches were removed. The frozen `src/data_access.py` remained unchanged.
+
+The assistant also confirmed the public repository as
+`RUOYUNWU-ui/z5652591_projectB`, with default branch `main`. It did not find a
+verified live Streamlit URL in the repository.
+
+### What was wrong or risky
+
+Earlier reproducibility wording referred only to four required files and, at an
+intermediate stage, a 21-file manifest. That was too narrow and later became
+outdated as the robustness and completed human-review outputs were added. A
+stale generated file could remain committed even though the four selected
+hashes matched. Another risk was treating a public GitHub repository as proof
+of deployment; the brief requires both the public repository and a working
+live Streamlit URL. Finally, `__pycache__` and `.pyc` files can reappear after
+tests even when the underlying submission is otherwise correct.
+
+### What I changed and why
+
+I expanded the comparison from selected outputs to the full final manifest and
+kept the reproducible entry point as `scripts/run_part_b.py`. I retained the
+final required-file SHA-256 values and complete audit details in
+`report/QA_REPORT.md`, rather than copying changing hashes into the narrative
+report. I authorised making the repository public and verified its current
+identity. I did not claim that Streamlit was deployed because the live URL was
+not verified; confirming that URL remains a student submission action. I also
+accepted the hand-in checker's cache warning as a packaging reminder rather
+than changing any model result.
+
+The checks catch date ordering, constraints, drift algebra and reproducible
+files, but they cannot determine whether an economic interpretation is
+reasonable. I therefore rewrote the report's financial discussion in my own
+words, completed the 50 headline labels myself and reviewed all 24 lexicon
+entries. Mixed and weaker results remain reported instead of being tuned away.
+
+---
+
+## 8. Audit the final report and adapt the supplied UNSW cover (14 August 2026)
+
+### What I wanted
+
+Check the complete report against the Part B rubric and use the uploaded UNSW
+report as a visual cover reference, while keeping the correct FINS5545,
+individual-project and student details.
+
+### Prompt(s)
+
+> "Check whether the full report meets the teacher's requirements and change
+> the cover to the format of the PDF I uploaded."
+
+> "Keep my manual financial-language revisions, use Harvard in-text citations,
+> and correct only content or formatting that conflicts with the brief or the
+> implemented program."
+
+### What the assistant produced
+
+The assistant compared the report with `PROJECT_BRIEF.md`, inspected the
+reference PDF, extracted the UNSW crest and adapted its cover hierarchy for an
+individual FINS5545 submission. It identified that Figures A1-A8 existed but
+were not all explicitly referenced in the narrative, and that the required
+sentiment-fusion before/after evidence had a figure and CSV but no report table.
+It added the missing fusion table, cross-referenced and interpreted every
+appendix exhibit, corrected terminology such as expanding window, sector-level
+tilt and covariance shrinkage, and repaired corrupted punctuation in the
+references. The final report contains 2,654 narrative words, seven narrative
+pages and 14 pages including cover, appendices and references.
+
+### What was wrong or risky
+
+The reference cover belonged to a different course and a group submission, so
+copying its text literally would have introduced false course and authorship
+information. During the first automated Word edit, a generic text-replacement
+loop also assigned empty text to picture and page-break runs. This removed the
+embedded figures and cover page break even though the document still opened.
+The error was visible only after rendering the DOCX. A second visual issue came
+from separate even-page headers and footers, which placed some page numbers
+partly outside the page. The report also could not honestly state that the app
+was live because no Streamlit URL had been verified.
+
+### What I changed and why
+
+I used the uploaded PDF only as a layout reference and retained the correct
+course, zID, individual-project title and sample dates. I restored the DOCX from
+the pre-edit backup, changed the script so it edits a run only when its text
+actually changes, and left picture and page-break XML untouched. I disabled the
+inconsistent even-page header/footer setting and regenerated the document. All
+14 pages were rendered to images and checked for figure loss, clipping, table
+overflow, captions, headers, footers and page numbering before the matching PDF
+was replaced. The report states the confirmed public repository but leaves the
+live Streamlit URL as an explicit outstanding submission requirement.
+
+---
+
+## 9. Close the final delivery gaps and prepare the hand-in (14 August 2026)
+
+### What I wanted
+
+Finish every remaining Project B item that could be completed locally: remove
+stale submission wording, protect the final student-edited report, rebuild from
+a clean results directory, run all tests, verify the app and public repository,
+and prepare the exact Moodle archive. The live Streamlit deployment should be
+attempted but not falsely reported if authentication prevented completion.
+
+### Prompt(s)
+
+> "Help me complete all remaining content for Project B."
+
+> "Treat the project as a final submission: reconcile the report, AI log,
+> generated evidence, app, repository and submission checklist, then verify the
+> result rather than assuming earlier checks still apply."
+
+### What the assistant produced
+
+The assistant updated the README, completion matrix, submission checklist and QA
+addendum to reflect the final 28-file build, completed human review, six-page app
+and public repository. It changed `scripts/build_report.py` to write an ignored
+`report_generated_draft.docx`, then ran it and confirmed the SHA-256 of the final
+student-edited `report/report.docx` was unchanged. A clean rebuild recreated
+10,392 fund-return rows, 17,280 weight rows, 20,120 sector-index rows, 12 fund
+metrics and all 28 expected result files. The four required hashes matched the
+final QA record. All 50 headline labels and all 24 reviewed lexicon decisions
+were restored automatically.
+
+The full suite passed 13 tests, the separate real-data no-look-ahead audit passed
+all 12 funds and 36 rebalances per fund, and `scripts/check_handin.py` passed 23
+checks with no warnings after generated caches were removed. A real local
+Streamlit server returned HTTP 200 and health body `ok`, and no listener remained
+after the check. GitHub was confirmed as public on `main`. Streamlit Community
+Cloud opened at its sign-in page, but the available controlled browser did not
+share the student's authenticated session.
+
+### What was wrong or risky
+
+Several files still described an older state: a private repository, 21 generated
+outputs, incomplete human review and an AI draft that the student still had to
+rewrite. More importantly, the report generator still targeted the final Word
+file, so a routine reproducibility command could erase the student's manual
+financial-language edits and new cover. The first clean rebuild also exposed an
+external compatibility issue: the course ZIP could be downloaded, but Anaconda's
+`pyarrow 19` raised `Repetition level histogram size mismatch`. Editing the frozen
+loader or preserving the deleted results without a clean build would both have
+weakened the audit. Finally, local HTTP success is not equivalent to a public
+Streamlit deployment, and bypassing or pretending to complete account sign-in
+would be dishonest.
+
+### What I changed and why
+
+I separated reproducible draft generation from the final authored report and
+verified this protection by hash. I did not modify `src/data_access.py`; instead,
+I reran the same official pipeline in the existing project environment with
+`pyarrow 24`, temporarily selecting the backup URL already specified by the
+frozen loader. This completed successfully and reproduced the recorded required
+hashes. I removed generated Python caches only after testing, reran the official
+checker, and used the verified Git snapshot to prepare the Moodle archive. The
+Streamlit sign-in page was left as an explicit handoff: deployment can be claimed
+complete only after the student authenticates and the resulting public URL opens
+in a logged-out browser.

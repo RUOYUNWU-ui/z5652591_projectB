@@ -1,0 +1,3 @@
+model,n_reviewed,agreement_rate,negative_agreement,neutral_agreement,positive_agreement,mean_student_confidence
+vader_plain,50,0.66,0.3333333333333333,0.7692307692307693,0.6666666666666666,3.78
+vader_enhanced,50,0.7,0.3333333333333333,0.7692307692307693,0.8,3.78

@@ -9,6 +9,8 @@ precomputed CSV artifacts written here.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import pathlib
 import sys
 from typing import Any
@@ -50,6 +52,8 @@ from src.sentiment import compare_vader_models, ensure_vader_lexicon  # noqa: E4
 DATA_DIR = ROOT / "results" / "data"
 TABLE_DIR = ROOT / "results" / "tables"
 FIGURE_DIR = ROOT / "results" / "figures"
+MANUAL_REVIEW_BACKUP = ROOT / "report" / "sentiment_manual_review_annotations.json"
+MANUAL_REVIEW_TEMPLATE = TABLE_DIR / "sentiment_manual_review_template.csv"
 
 FAMILY_LABELS = {
     "equity": "Equity-only",
@@ -73,6 +77,100 @@ FUSION_COLORS = {
     "momentum": ACCENT_ALT,
     "contrarian": ACCENT_LINE,
 }
+
+
+def _truthy(value: object) -> bool:
+    """Interpret CSV/JSON boolean values without treating 'False' as true."""
+    return str(value).strip().lower() in {"true", "1", "yes"}
+
+
+def _title_hash(value: object) -> str:
+    return hashlib.sha256(str(value).encode("utf-8")).hexdigest()
+
+
+def _save_manual_review_backup(frame: pd.DataFrame) -> None:
+    """Persist student annotations outside generated ``results/`` artifacts."""
+    required = {
+        "headline_id", "title", "student_label", "student_confidence",
+        "student_notes", "review_complete",
+    }
+    if not required.issubset(frame.columns):
+        return
+    annotated = frame["student_label"].fillna("").astype(str).str.strip().ne("")
+    if not annotated.any():
+        return
+    records = []
+    for row in frame.loc[annotated].itertuples(index=False):
+        records.append(
+            {
+                "headline_id": int(row.headline_id),
+                "title_sha256": _title_hash(row.title),
+                "student_label": str(row.student_label).strip().lower(),
+                "student_confidence": int(float(row.student_confidence)),
+                "student_notes": str(row.student_notes),
+                "review_complete": _truthy(row.review_complete),
+            }
+        )
+    payload = {
+        "schema_version": 1,
+        "provenance": "Student-supplied manual labels; preserved by run_part_b.py",
+        "records": records,
+    }
+    MANUAL_REVIEW_BACKUP.parent.mkdir(parents=True, exist_ok=True)
+    MANUAL_REVIEW_BACKUP.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+
+
+def _prepare_manual_review_template(review_sample: pd.DataFrame) -> pd.DataFrame:
+    """Create the review template while preserving any prior human annotations.
+
+    Existing labels are backed up before the generated CSV is replaced. The
+    JSON backup lives outside ``results/``, so a later clean rebuild can restore
+    the annotations instead of silently blanking them.
+    """
+    if MANUAL_REVIEW_TEMPLATE.exists():
+        _save_manual_review_backup(pd.read_csv(MANUAL_REVIEW_TEMPLATE))
+
+    template = review_sample.copy()
+    template["student_label"] = ""
+    template["student_confidence"] = ""
+    template["student_notes"] = ""
+    template["review_complete"] = False
+    # Object dtype accepts restored numeric confidence values as well as blank
+    # cells in a new template under either NumPy- or Arrow-backed pandas.
+    for column in (
+        "student_label", "student_confidence", "student_notes", "review_complete"
+    ):
+        template[column] = template[column].astype("object")
+    if not MANUAL_REVIEW_BACKUP.exists():
+        return template
+
+    payload = json.loads(MANUAL_REVIEW_BACKUP.read_text(encoding="utf-8"))
+    annotations = pd.DataFrame(payload.get("records", []))
+    if annotations.empty:
+        return template
+    if annotations["headline_id"].duplicated().any():
+        raise RuntimeError("Manual-review backup has duplicate headline_id values")
+
+    fresh = template.set_index("headline_id", drop=False)
+    missing_ids = sorted(set(annotations["headline_id"]) - set(fresh.index))
+    if missing_ids:
+        raise RuntimeError(
+            "Manual-review sample changed; refusing to discard annotations for IDs "
+            + ", ".join(map(str, missing_ids[:5]))
+        )
+    annotations = annotations.set_index("headline_id")
+    for headline_id, annotation in annotations.iterrows():
+        if annotation["title_sha256"] != _title_hash(fresh.loc[headline_id, "title"]):
+            raise RuntimeError(
+                f"Headline {headline_id} changed; manual annotation was not applied"
+            )
+        for column in (
+            "student_label", "student_confidence", "student_notes", "review_complete"
+        ):
+            fresh.loc[headline_id, column] = annotation[column]
+    return fresh.reset_index(drop=True)
 
 
 def _prepare_foundation() -> dict[str, Any]:
@@ -144,7 +242,8 @@ def _run_funds(state: dict[str, Any]) -> dict[str, Any]:
             weights = weights[
                 [
                     "rebalance_date", "effective_date", "fund_id", "ticker",
-                    "asset_class", "sector", "weight", "estimation_end",
+                    "asset_class", "sector", "pre_trade_weight", "weight",
+                    "trade_weight_change", "rebalance_turnover", "estimation_end",
                 ]
             ]
             weight_frames.append(weights)
@@ -333,14 +432,15 @@ def _write_data_and_tables(
     sentiment["review_sample"].to_csv(
         TABLE_DIR / "sentiment_manual_review_sample.csv", index=False
     )
-    review_template = sentiment["review_sample"].copy()
-    review_template["student_label"] = ""
-    review_template["student_confidence"] = ""
-    review_template["student_notes"] = ""
-    review_template["review_complete"] = False
-    review_template.to_csv(
-        TABLE_DIR / "sentiment_manual_review_template.csv", index=False
-    )
+    review_template = _prepare_manual_review_template(sentiment["review_sample"])
+    review_template.to_csv(MANUAL_REVIEW_TEMPLATE, index=False)
+    if review_template["review_complete"].map(_truthy).all():
+        from scripts.validate_sentiment_review import validate
+
+        validate(
+            MANUAL_REVIEW_TEMPLATE,
+            TABLE_DIR / "sentiment_manual_review_validation.csv",
+        )
     sentiment["lexicon_candidates"].to_csv(
         TABLE_DIR / "finance_lexicon_candidates.csv", index=False
     )

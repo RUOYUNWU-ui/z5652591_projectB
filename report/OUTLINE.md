@@ -71,6 +71,10 @@ candidates" below for what still needs to be genuinely mine.
   date, and take effect from the next trading day - the first OOS return date
   is therefore strictly after the initial estimation window, never the first
   date in the sample.
+- After a target becomes effective, holdings drift with each asset's realised
+  return until the next monthly rebalance. Rebalance turnover is measured from
+  the drifted pre-trade portfolio to the new target,
+  $0.5\sum_i|w^{target}_{i,t}-w^{pre}_{i,t}|$; initial funding is not counted.
 - Combined fund trades on the equity calendar (Part A's
   `combine_equity_crypto_returns` convention); weekend-only crypto moves are
   not separately tradeable.
@@ -112,14 +116,15 @@ candidates" below for what still needs to be genuinely mine.
   affect any fund weight - a Saturday/Monday headline (mapped to Monday) is
   first usable for Tuesday's rebalance/trade, never Monday's.
 - Fusion (`apply_sentiment`) tilts equity weights only, then renormalises to
-  keep long-only and fully-invested. Tilt mechanics follow the course
-  reference's own worked formula: standardise each ticker's lagged sentiment
-  into a rolling z-score using only data up to and including day t-1
-  ($z_{i,t} = (s_{i,t}-\bar s_{i,t})/\sigma^s_{i,t}$), tilt
-  $\tilde w_{i,t} = w_i^{base}(1+\lambda z_{i,t})$, then clip negatives to 0
+  keep long-only and fully-invested. This is explicitly a **sector-level
+  tilt**, because the available index is sector-level: each ticker inherits
+  its sector's lagged score. Standardise each sector's lagged sentiment into a
+  rolling z-score using only information available before the trade date
+  ($z_{g,t} = (s_{g,t}-\bar s_{g,t})/\sigma^s_{g,t}$), then for ticker $i$ in
+  sector $g(i)$ set $\tilde w_{i,t} = w_i^{base}(1+\lambda z_{g(i),t})$, clip negatives to 0
   and renormalise ($w_{i,t} = \max(\tilde w_{i,t},0) / \sum_j \max(\tilde
   w_{j,t},0)$). $\lambda>0$ is a momentum tilt (more weight to good-news
-  names), $\lambda<0$ is contrarian, $\lambda=0$ reproduces the base fund
+  sectors), $\lambda<0$ is contrarian, $\lambda=0$ reproduces the base fund
   exactly - useful as a self-check.
 - Base fund for the fusion comparison: minimum-variance equity fund (matches
   the course reference's own worked example, so results are directly
@@ -155,3 +160,10 @@ questions without tuning: Ledoit-Wolf covariance shrinkage tests estimator
 risk, while the fixed-bps transaction-cost curve tests implementation drag.
 Both are reported separately from the canonical 12 funds; neither parameter or
 baseline result was changed after viewing OOS performance.
+
+**Correction (2026-08-14):** the earlier wording described the fusion as a
+ticker-level z-score even though the implemented and available signal is the
+sector sentiment index. The wording above now states the actual sector-level
+tilt. The backtest implementation was also corrected to let holdings drift
+between monthly target dates and to calculate turnover from pre-trade to target
+weights; this is an implementation correction, not result-driven retuning.

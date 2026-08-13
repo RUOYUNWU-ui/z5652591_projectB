@@ -1,4 +1,9 @@
-"""Build the editable Part B report and matching PDF from saved evidence."""
+"""Build an evidence-driven report draft without overwriting the final report.
+
+The submitted ``report/report.docx`` contains the student's final manual edits.
+This script deliberately writes a separate reproducible draft so rerunning it
+cannot destroy that authored source.
+"""
 from __future__ import annotations
 
 import pathlib
@@ -17,7 +22,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 REPORT_DIR = ROOT / "report"
 FIGURE_DIR = ROOT / "results" / "figures"
 TABLE_DIR = ROOT / "results" / "tables"
-OUTPUT = REPORT_DIR / "report.docx"
+OUTPUT = REPORT_DIR / "report_generated_draft.docx"
 
 NAVY = "2C3E50"
 BLUE = "315B7D"
@@ -225,9 +230,9 @@ def add_cover(doc: Document) -> None:
     note = doc.add_table(rows=1, cols=1)
     note.style = "Table Grid"
     note.cell(0, 0).text = (
-        "AI-assisted editable draft. The student must verify every number, complete "
-        "the 50-headline manual review, and rewrite the final economic interpretation "
-        "in their own words before submission."
+        "AI-assisted editable draft. The 50-headline and 24-term reviews are complete; "
+        "the student must still verify every number and rewrite the final economic "
+        "interpretation in their own words before submission."
     )
     shade(note.cell(0, 0), "FFF5DE")
     set_fixed_table(note, [6.5])
@@ -248,6 +253,32 @@ def build() -> pathlib.Path:
     sentiment = pd.read_csv(TABLE_DIR / "sentiment_model_comparison.csv")
     shrinkage = pd.read_csv(TABLE_DIR / "shrinkage_comparison.csv")
     costs = pd.read_csv(TABLE_DIR / "transaction_cost_sensitivity.csv")
+    fund_weights = pd.read_csv(TABLE_DIR.parent / "data" / "fund_weights.csv")
+    sector_index = pd.read_csv(TABLE_DIR.parent / "data" / "sector_sentiment_index.csv")
+    manual_validation = pd.read_csv(
+        TABLE_DIR / "sentiment_manual_review_validation.csv"
+    )
+    manual_review = pd.read_csv(TABLE_DIR / "sentiment_manual_review_template.csv")
+    lexicon_review = pd.read_csv(TABLE_DIR / "finance_lexicon_candidates.csv")
+
+    metric_by_fund = metrics.set_index("fund_id")
+    min_var = metrics.loc[metrics["method"].eq("min_variance")].set_index(
+        "asset_family"
+    )
+    combined_crypto = fund_weights.loc[
+        fund_weights["asset_class"].eq("crypto")
+        & fund_weights["fund_id"].str.startswith("combined_")
+    ]
+    mean_crypto_weight = combined_crypto.groupby("fund_id")["weight"].sum().div(
+        combined_crypto["effective_date"].nunique()
+    )
+    enhanced_sector = sector_index.loc[
+        sector_index["model"].eq("vader_finance_enhanced")
+    ]
+    sector_summary = enhanced_sector.groupby("sector").agg(
+        mean_sentiment=("sentiment", "mean"),
+        mean_headlines=("n_headlines", "mean"),
+    )
 
     doc = Document()
     configure(doc)
@@ -261,7 +292,8 @@ def build() -> pathlib.Path:
         "foundation into 12 investable fund simulations, a sector news-sentiment index, "
         "and an investor dashboard. Every fund is evaluated using a monthly expanding-"
         "window walk-forward design: information available by a rebalance date sets "
-        "weights that become effective on the next trading day."
+        "weights that become effective on the next trading day, after which holdings "
+        "drift with realised returns until the next monthly trade."
     )
     best = metrics.loc[metrics["sharpe"].idxmax()]
     doc.add_paragraph(
@@ -282,7 +314,8 @@ def build() -> pathlib.Path:
         "this sample, especially for the contrarian direction, but this is exploratory "
         "rather than proof of a stable forecasting relation. Two robustness extensions "
         "add practical depth: Ledoit-Wolf covariance shrinkage and a 0-100 basis-point "
-        "transaction-cost curve."
+        "transaction-cost curve. A completed 50-headline human review improved overall "
+        "agreement from 66% for plain VADER to 70% for the enhanced model."
     )
     doc.add_heading("1. Product and investor proposition", level=1)
     doc.add_paragraph(
@@ -323,8 +356,9 @@ def build() -> pathlib.Path:
         "2021 for equity and combined funds and 2 January 2021 for crypto. An automated "
         "audit confirms estimation_end is strictly earlier than effective_date for all "
         "432 fund-rebalance records. Equity and combined statistics use 252-day "
-        "annualisation; crypto uses 365 days. Baseline transaction costs are zero and "
-        "average rebalance turnover is reported rather than hidden."
+        "annualisation; crypto uses 365 days. Baseline transaction costs are zero. "
+        "Holdings drift between monthly effective dates; turnover is half the absolute "
+        "difference between drifted pre-trade and new target weights."
     )
     add_table(
         doc,
@@ -343,28 +377,40 @@ def build() -> pathlib.Path:
 
     doc.add_heading("3. Out-of-sample fund results", level=1)
     doc.add_paragraph(
-        "Figure A1 and Table A1 report all 12 funds. Equity equal weight achieved a "
-        "Sharpe ratio of 0.85, ahead of the three optimised equity alternatives. This "
+        "Figure A1 and Table A1 report all 12 funds. The growth paths show that the "
+        "fastest-growing crypto funds also experienced the widest fluctuations, while "
+        "equity and combined minimum variance followed the smoothest paths. Equity equal "
+        f"weight achieved a Sharpe ratio of {metric_by_fund.loc['equity_equal_weight','sharpe']:.2f}, "
+        "ahead of the three optimised equity alternatives. This "
         "is economically plausible: estimating means and covariances from a short, "
         "non-stationary sample can introduce enough error to offset theoretical gains. "
         "Maximum Sharpe was the weakest equity method on risk-adjusted performance and "
         "also had the highest turnover, consistent with sensitivity to estimated means."
     )
     doc.add_paragraph(
-        "Crypto risk parity and equal weight produced annualised returns of 35.3% and "
-        "33.7%, but their annualised volatility was about 79%-80% and maximum drawdowns "
-        "exceeded 80%. Minimum variance reduced crypto volatility to 64.3%, still far "
-        "above every equity fund. These results make a critical product distinction: "
+        f"Crypto risk parity and equal weight produced annualised returns of "
+        f"{pct(metric_by_fund.loc['crypto_risk_parity','annualised_return'])} and "
+        f"{pct(metric_by_fund.loc['crypto_equal_weight','annualised_return'])}, but their "
+        "annualised volatility was about 80%-82% and maximum drawdowns exceeded 80%. "
+        "Figure A2 isolates minimum variance: crypto still lost "
+        f"{abs(min_var.loc['crypto','max_drawdown']):.1%} from peak to trough versus "
+        f"{abs(min_var.loc['equity','max_drawdown']):.1%} for equity. The equity and "
+        "combined lines overlap because their minimum-variance allocations are nearly "
+        "identical. These results make a critical product distinction: "
         "high ending wealth does not imply a tolerable investor journey. The dashboard "
         "therefore shows drawdown and volatility alongside return."
     )
     doc.add_paragraph(
-        "Combined risk parity recorded the strongest combined-fund Sharpe (0.80), while "
-        "combined equal weight returned 15.2% annually with a 0.77 Sharpe. Combined "
-        "minimum variance matched equity minimum variance to numerical precision. Its "
-        "low-volatility objective largely rejected crypto, so adding a broad universe "
-        "did not force diversification into assets that worsened the estimated risk "
-        "objective. Figure A4 makes that allocation mechanism visible."
+        "Figure A3 explains the combined-fund allocation mechanism. Average crypto "
+        f"exposure was {mean_crypto_weight.loc['combined_equal_weight']:.1%} for equal "
+        f"weight, {mean_crypto_weight.loc['combined_max_sharpe']:.1%} for maximum Sharpe, "
+        f"{mean_crypto_weight.loc['combined_risk_parity']:.1%} for risk parity and "
+        f"{mean_crypto_weight.loc['combined_min_variance']:.1%} for minimum variance. "
+        "The low-volatility objective therefore rejected crypto rather than forcing "
+        "diversification. Figure A4 compares risk-adjusted results: combined risk parity "
+        f"led its family at {metric_by_fund.loc['combined_risk_parity','sharpe']:.2f}, "
+        f"while combined maximum Sharpe was lowest at "
+        f"{metric_by_fund.loc['combined_max_sharpe','sharpe']:.2f}."
     )
     selected = metrics.loc[metrics["fund_id"].isin([
         "equity_equal_weight", "crypto_risk_parity", "combined_risk_parity",
@@ -400,14 +446,62 @@ def build() -> pathlib.Path:
         "The finance lexicon extension adjusts a pre-specified set of domain words while "
         "preserving the VADER rules. It lowered the neutral classification rate by 1.76 "
         "percentage points across 146,830 headlines. That is coverage evidence, not an "
-        "accuracy claim. Financial dictionaries are useful because ordinary-language "
-        "polarity can differ from financial usage [7], but the required independent "
-        "50-headline student review is still outstanding. The generated template and "
-        "validator make that limitation explicit and reproducible."
+        "accuracy claim. All 24 AI-proposed terms, valences and rationales were reviewed "
+        f"by the student; {int(lexicon_review['final_decision'].eq('Accept').sum())} were "
+        "accepted. Financial dictionaries are useful because ordinary-language polarity "
+        "can differ from financial usage [7], but human validation remains necessary."
+    )
+    validation = manual_validation.set_index("model")
+    label_counts = manual_review["student_label"].str.lower().value_counts()
+    doc.add_paragraph(
+        "The stratified human review covered 50 headlines: "
+        f"{int(label_counts.get('negative', 0))} negative, "
+        f"{int(label_counts.get('neutral', 0))} neutral and "
+        f"{int(label_counts.get('positive', 0))} positive, with mean confidence "
+        f"{validation.loc['vader_enhanced','mean_student_confidence']:.2f}/5. "
+        "Enhanced VADER raised overall agreement from "
+        f"{validation.loc['vader_plain','agreement_rate']:.0%} to "
+        f"{validation.loc['vader_enhanced','agreement_rate']:.0%}, driven by positive "
+        f"agreement rising from {validation.loc['vader_plain','positive_agreement']:.1%} "
+        f"to {validation.loc['vader_enhanced','positive_agreement']:.1%}. Negative "
+        f"agreement remained only {validation.loc['vader_enhanced','negative_agreement']:.1%}; "
+        "the extension is therefore a modest improvement, not a solved classifier."
+    )
+    add_table(
+        doc,
+        ["Model", "Overall", "Negative", "Neutral", "Positive"],
+        [
+            [
+                model.replace("vader_", "VADER ").title(),
+                pct(row.agreement_rate), pct(row.negative_agreement),
+                pct(row.neutral_agreement), pct(row.positive_agreement),
+            ]
+            for model, row in validation.iterrows()
+        ],
+        [1.70, 1.20, 1.20, 1.20, 1.20],
+    )
+    add_caption(doc, "Table 3. Agreement with the completed 50-headline human review.")
+    highest_sentiment_sector = sector_summary["mean_sentiment"].idxmax()
+    lowest_sentiment_sector = sector_summary["mean_sentiment"].idxmin()
+    highest_coverage_sector = sector_summary["mean_headlines"].idxmax()
+    lowest_coverage_sector = sector_summary["mean_headlines"].idxmin()
+    doc.add_paragraph(
+        f"Figure A5 shows the sector index rather than a prediction of returns. Average "
+        f"enhanced sentiment was highest for {highest_sentiment_sector} "
+        f"({sector_summary.loc[highest_sentiment_sector,'mean_sentiment']:.3f}) and lowest "
+        f"for {lowest_sentiment_sector} "
+        f"({sector_summary.loc[lowest_sentiment_sector,'mean_sentiment']:.3f}). Coverage "
+        f"was uneven: {highest_coverage_sector} averaged "
+        f"{sector_summary.loc[highest_coverage_sector,'mean_headlines']:.1f} headlines per "
+        f"sector-day versus {sector_summary.loc[lowest_coverage_sector,'mean_headlines']:.1f} "
+        f"for {lowest_coverage_sector}. The 20-day lines clarify persistent tone, while "
+        "the faint daily series shows why single-day sentiment should not be over-read."
     )
     base = fusion.set_index("variant")
     doc.add_paragraph(
-        f"Fusion starts from the equity minimum-variance fund. Fixed lambda values of 0, "
+        f"Figure A6 evaluates a sector-level fusion starting from the equity minimum-"
+        f"variance fund: every ticker inherits its sector's lagged rolling z-score. "
+        f"Fixed lambda values of 0, "
         f"+1 and -1 preserve the base, momentum and contrarian directions without tuning "
         f"on the full OOS period. The base Sharpe was {base.loc['base','sharpe']:.2f}; "
         f"momentum reached {base.loc['momentum','sharpe']:.2f}; and contrarian reached "
@@ -445,11 +539,12 @@ def build() -> pathlib.Path:
         ])
     add_table(doc, ["Family", "Method", "LW Sharpe", "Change"], rows,
               [1.30, 2.35, 1.35, 1.50])
-    add_caption(doc, "Table 3. Ledoit-Wolf versus sample-covariance OOS Sharpe, 2021-2023.")
+    add_caption(doc, "Table 4. Ledoit-Wolf versus sample-covariance OOS Sharpe, 2021-2023.")
     doc.add_paragraph(
-        "Shrinkage materially helped crypto minimum variance (+0.097 Sharpe) and modestly "
-        "helped crypto maximum Sharpe (+0.040). Its effect was small or negative for the "
-        "other four comparisons. The honest conclusion is conditional: covariance "
+        "Figure A7 shows that shrinkage materially helped crypto minimum variance "
+        f"({lw['delta_sharpe'].max():+.3f} Sharpe) but reduced combined minimum variance "
+        f"({lw['delta_sharpe'].min():+.3f}). Its effect was smaller for the other four "
+        "comparisons. The honest conclusion is conditional: covariance "
         "regularisation appears most valuable in the volatile crypto universe, but it "
         "does not uniformly dominate the baseline."
     )
@@ -458,12 +553,14 @@ def build() -> pathlib.Path:
     doc.add_paragraph(
         "The second check deducts turnover multiplied by fixed one-way costs of 0, 10, "
         "25, 50 and 100 basis points on post-launch rebalance dates. Costs do not alter "
-        "portfolio formation. At 50 bps, maximum-Sharpe funds suffer the largest Sharpe "
-        "reductions: -0.040 for equity and -0.030 for combined, reflecting total turnover "
-        "of 5.64 and 6.31 times capital. Risk parity changes by roughly 0.001 or less, and "
-        "equal weight incurs no post-launch rebalance turnover under the implemented "
-        "constant-target convention. Figure A8 shows the full curves rather than one "
-        "chosen cost assumption."
+        "portfolio formation. The engine first lets holdings drift with returns, then "
+        "measures pre-trade-to-target turnover at each monthly rebalance. At 50 bps, "
+        "Figure A8 shows the largest Sharpe reduction for equity maximum Sharpe "
+        f"({costs.loc[(costs['fund_id'].eq('equity_max_sharpe')) & costs['cost_bps'].eq(50),'sharpe_change_vs_gross'].iat[0]:+.3f}), "
+        f"whose total turnover was {costs.loc[(costs['fund_id'].eq('equity_max_sharpe')) & costs['cost_bps'].eq(50),'total_rebalance_turnover'].iat[0]:.2f} "
+        "times capital. Equal-weight funds now incur non-zero trading because relative "
+        "asset returns move pre-trade holdings away from equal targets; this is more "
+        "realistic than the earlier constant-target convention."
     )
     doc.add_paragraph(
         "This strengthens product interpretation. A theoretically appealing optimiser "
@@ -484,12 +581,12 @@ def build() -> pathlib.Path:
         "cost assumptions inspectable rather than hiding them in a technical appendix."
     )
     doc.add_paragraph(
-        "The deployed architecture is deliberately thin: it imports neither NLTK nor an "
+        "The application architecture is deliberately thin: it imports neither NLTK nor an "
         "optimiser and never downloads the raw data. This separates research from "
         "delivery, shortens load time, and allows app acceptance tests to confirm that "
-        "every page opens from committed artifacts. At the time of this draft the code "
-        "is in a private GitHub repository; the brief requires the student to make it "
-        "public at hand-in and complete the authenticated Streamlit deployment."
+        "every page opens from committed artifacts. The code is in the public GitHub "
+        "repository https://github.com/RUOYUNWU-ui/z5652591_projectB on the main branch. "
+        "The live Streamlit URL must still be verified and submitted separately."
     )
 
     doc.add_heading("7. Critical reflection and recommendations", level=1)
@@ -500,9 +597,10 @@ def build() -> pathlib.Path:
         "automatic upgrade. Second, treat crypto as a separately disclosed risk budget. "
         "Its drawdowns exceeded 75% even for minimum variance; user allocations should "
         "include suitability warnings and scenario-based loss communication. Third, "
-        "validate the text model before any production claim. Complete the stratified "
-        "manual review, inspect sector-specific errors, and only then decide whether the "
-        "finance lexicon improved human agreement."
+        "treat the text model as a noisy contextual indicator. The completed review finds "
+        "a four-percentage-point gain in overall agreement but weak negative agreement, "
+        "so production use would require a larger independently labelled sample and "
+        "sector-specific error analysis."
     )
     doc.add_paragraph(
         "Three further recommendations follow. (1) Extend the OOS sample before changing "
@@ -564,14 +662,15 @@ def build() -> pathlib.Path:
         ["Sector sentiment", "results/data/sector_sentiment_index.csv"],
         ["Fund metrics", "results/tables/performance_metrics.csv"],
         ["Robustness tables", "results/tables/shrinkage_comparison.csv; transaction_cost_sensitivity.csv"],
-        ["Manual review workflow", "results/tables/sentiment_manual_review_template.csv; scripts/validate_sentiment_review.py"],
+        ["Completed manual review", "sentiment_manual_review_template.csv; sentiment_manual_review_validation.csv"],
     ], [2.2, 4.3])
     add_caption(doc, "Table B1. Key reproducible evidence paths.")
     doc.add_paragraph(
         "AI produced code and this editable draft under student direction. The student "
-        "remains responsible for inspecting the code, completing the manual labels, "
-        "checking all outputs, and rewriting the final analysis and economic interpretation "
-        "in their own voice. No AI-generated labels are represented as human validation."
+        "remains responsible for inspecting the code, checking all outputs, and rewriting "
+        "the final analysis and economic interpretation in their own voice. The 50 "
+        "headline labels and 24 lexicon decisions were supplied by the student and are "
+        "stored separately from model predictions."
     )
 
     doc.add_page_break()
