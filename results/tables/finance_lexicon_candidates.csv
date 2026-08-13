@@ -1,0 +1,25 @@
+term,score,rationale,review_status
+beat,2.0,Results above expectations are positive.,AI candidate - student review required
+beats,2.0,Inflected form of an expectations beat.,AI candidate - student review required
+miss,-2.0,Results below expectations are negative.,AI candidate - student review required
+misses,-2.0,Inflected form of an expectations miss.,AI candidate - student review required
+upgrade,2.2,An analyst/rating upgrade is favourable.,AI candidate - student review required
+upgraded,2.2,Past-tense analyst/rating upgrade.,AI candidate - student review required
+downgrade,-2.2,An analyst/rating downgrade is adverse.,AI candidate - student review required
+downgraded,-2.2,Past-tense analyst/rating downgrade.,AI candidate - student review required
+outperform,1.8,Positive relative-performance rating.,AI candidate - student review required
+outperforms,1.8,Positive relative-performance outcome.,AI candidate - student review required
+underperform,-1.8,Negative relative-performance rating.,AI candidate - student review required
+underperforms,-1.8,Negative relative-performance outcome.,AI candidate - student review required
+bullish,2.0,Explicit positive market direction.,AI candidate - student review required
+bearish,-2.0,Explicit negative market direction.,AI candidate - student review required
+buyback,1.5,Repurchase announcements often support value per share.,AI candidate - student review required
+buybacks,1.5,Plural form of share repurchase.,AI candidate - student review required
+surges,2.3,Large positive price/operating move.,AI candidate - student review required
+plunges,-2.5,Large negative price/operating move.,AI candidate - student review required
+selloff,-2.2,Broad or security-specific selling pressure.,AI candidate - student review required
+bankruptcy,-3.2,Severe financial distress event.,AI candidate - student review required
+bankrupt,-3.2,Severe financial distress condition.,AI candidate - student review required
+insolvency,-3.0,Inability to meet financial obligations.,AI candidate - student review required
+delisting,-2.5,Loss or threatened loss of exchange listing.,AI candidate - student review required
+slashes,-2.2,"Strong downward revision to guidance, jobs or payout.",AI candidate - student review required

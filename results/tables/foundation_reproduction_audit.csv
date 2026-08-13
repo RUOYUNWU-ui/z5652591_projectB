@@ -1,0 +1,10 @@
+check,count
+equity_missing_dates,0
+equity_duplicates,0
+equity_outliers,192
+crypto_2024_rows,10
+crypto_duplicates,0
+crypto_outliers,60
+news_duplicates,2847
+news_after_calendar,6
+headline_panel_rows,37962

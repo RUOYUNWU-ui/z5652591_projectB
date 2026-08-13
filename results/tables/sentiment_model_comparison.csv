@@ -1,0 +1,3 @@
+model,n_headlines,neutral_rate
+vader_plain,146830,0.4957365660968467
+vader_finance_enhanced,146830,0.4780903085200572
