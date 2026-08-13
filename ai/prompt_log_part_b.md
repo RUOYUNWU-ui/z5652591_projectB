@@ -425,3 +425,47 @@ weight cap and the combined-fund crypto-exposure cap, both left as `TBD` in
 `report/OUTLINE.md` to be set explicitly (and recorded here) when
 `src/portfolios.py` is drafted, rather than picked implicitly by whatever the
 optimiser happens to do.
+
+---
+
+## 2026-08-14 - Robustness lab and editable report draft
+
+### What I asked
+
+I asked Codex to complete the grade-raising work already recommended: add an
+untuned covariance-shrinkage check, a transaction-cost sensitivity curve,
+integrate both into reproducible outputs and the app, prepare the required
+manual sentiment-review workflow, draft the Part B report, verify everything,
+and keep the GitHub repository private while building.
+
+### What the assistant produced
+
+- Added a separate robustness module. The default optimiser still uses sample
+  covariance; Ledoit-Wolf is explicitly selected only for the extension.
+- Added 0/10/25/50/100 bps cost curves based on realised rebalance turnover.
+- Added tests confirming the default sample-covariance path is unchanged,
+  shrinkage uses the same OOS schedule, and higher costs reduce ending wealth.
+- Added three CSV outputs, two figures, and a sixth Streamlit page called
+  `Robustness Lab`, all based on precomputed artifacts.
+- Added a reproducible 50-headline review template and a strict validator. The
+  assistant did not fabricate student labels.
+- Generated `report.docx` and `report.pdf`, then rendered and visually reviewed
+  all 14 pages. The report identifies itself as an AI-assisted draft and leaves
+  final economic wording and human sentiment labels to me.
+
+### What was wrong or risky
+
+The first local rebuild could not download the frozen data bundle because the
+execution sandbox blocked network access. It was rerun with explicit network
+permission; `src/data_access.py` was not changed. The first report render found
+that the references spilled as two isolated items onto a mostly blank final
+page and that the transaction-cost discussion referred to Figure A9 although
+the exhibit was A8. References were moved to their own page and the figure
+number was corrected before the final render.
+
+### What I must still do myself
+
+I must label the 50 sampled headlines, run the validator, verify and rewrite
+the report's economic interpretation in my own voice, and make the repository
+public only at hand-in. These are student-authorship and account decisions, not
+tasks that should be silently automated or misrepresented as complete.

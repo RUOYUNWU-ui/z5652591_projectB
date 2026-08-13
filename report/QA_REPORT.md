@@ -239,3 +239,55 @@ All checks passed - ready to zip and deploy.
 
 There are zero `[FAIL]` items. The sole warning remains a genuine student task,
 not a reproducibility or code defect.
+
+## Addendum - 2026-08-14: innovation extensions, report, and app integration
+
+Two pre-specified robustness extensions were implemented without replacing or
+retuning the canonical 12-fund baseline. First, minimum-variance and
+maximum-Sharpe funds were rerun with Ledoit-Wolf covariance shrinkage estimated
+inside each expanding window. The largest change was crypto minimum variance
+(Sharpe +0.097); crypto maximum Sharpe changed +0.040, while the other four
+comparisons ranged from -0.013 to +0.014. The result is mixed rather than a
+universal improvement. Second, every baseline fund was evaluated at one-way
+transaction costs of 0, 10, 25, 50, and 100 bps, charged on post-launch
+rebalance turnover. At 50 bps, the largest Sharpe reductions were equity
+maximum Sharpe (-0.040) and combined maximum Sharpe (-0.030), consistent with
+their substantially higher turnover.
+
+The extensions write `shrinkage_comparison.csv`,
+`transaction_cost_sensitivity.csv`, and a separate shrinkage return history.
+The Streamlit app now has a sixth precomputed-results page, `Robustness Lab`,
+that exposes both experiments without importing scikit-learn or recomputing a
+backtest at runtime. The four marker-required baseline files retained their
+previous SHA-256 hashes exactly.
+
+A stratified 50-headline manual-review template and validator were added. The
+student-label fields are intentionally blank: AI labels would not constitute
+independent human validation. The validator refuses incomplete labels and,
+after genuine student review, reports plain-versus-enhanced VADER agreement.
+
+An editable 14-page report draft was generated as `report/report.docx`, with a
+matching `report/report.pdf`. Pages 1-7 contain the narrative; pages 8-14 are
+appendices and references. All 14 pages were rendered to PNG and visually
+checked for clipping, table overflow, figure readability, headers, footers, and
+page numbering. One incorrect cross-reference (`Figure A9`) was corrected to
+`Figure A8`, then the document was regenerated and rechecked. The report is
+clearly marked as an AI-assisted draft and does not claim the outstanding
+manual review is complete.
+
+### Final clean-build verification after the extensions
+
+`results/` was deleted in full and recreated only by
+`python scripts/run_part_b.py`. The clean run produced exactly 27 files: 7 app
+data CSVs, 9 figures, and 11 report/audit tables. No committed result lies
+outside that generated set. The four required hashes remained:
+
+- `fund_returns.csv`: `B40D79D4F05E0F2DBE96FD614376AD2153C63BB05E1FE96367334B000C35E6D8`;
+- `fund_weights.csv`: `7314A174374B1D116B9B053D83FA5E4EDB5BBADE870A1218E93738A543BF7F60`;
+- `sector_sentiment_index.csv`: `0EE9F1613A76F3047B8947A6535E040FC1F9E382770F55E205A599C79CBA6482`;
+- `performance_metrics.csv`: `EBC34A0CE738FF8F7B09792B27A45D8C4BEE931B9961BDF931D266149A2EE401`.
+
+The expanded suite passed **10 tests**. The separate real-data no-look-ahead
+test passed all 12 funds and 36 rebalances per fund. After deleting generated
+Python caches, `scripts/check_handin.py` passed **23 checks with zero warnings
+and zero failures**.

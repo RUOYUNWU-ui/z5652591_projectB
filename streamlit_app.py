@@ -83,6 +83,8 @@ def load_artifacts() -> dict[str, pd.DataFrame]:
         "metrics": ROOT / "results" / "tables" / "performance_metrics.csv",
         "holdings": ROOT / "results" / "tables" / "current_holdings.csv",
         "fusion_metrics": ROOT / "results" / "tables" / "fusion_comparison.csv",
+        "shrinkage": ROOT / "results" / "tables" / "shrinkage_comparison.csv",
+        "costs": ROOT / "results" / "tables" / "transaction_cost_sensitivity.csv",
     }
     missing = [str(path.relative_to(ROOT)) for path in paths.values() if not path.exists()]
     if missing:
@@ -162,7 +164,10 @@ except Exception as exc:
 
 navigation = st.sidebar.radio(
     "Investor journey",
-    ["Home", "Fund Comparison", "Fund Fact Sheet", "Allocation Builder", "Sentiment Analytics"],
+    [
+        "Home", "Fund Comparison", "Fund Fact Sheet", "Allocation Builder",
+        "Sentiment Analytics", "Robustness Lab",
+    ],
 )
 st.sidebar.markdown("---")
 st.sidebar.caption("Precomputed OOS evidence | Sample ends 2023-12-31")
@@ -370,7 +375,7 @@ elif navigation == "Allocation Builder":
         )
 
 
-else:  # Sentiment Analytics
+elif navigation == "Sentiment Analytics":
     st.title("Sentiment Analytics")
     st.caption("Headline sentiment is a noisy sector-level proxy, not a causal or predictive claim.")
     model = st.selectbox(
@@ -450,4 +455,96 @@ else:  # Sentiment Analytics
     st.info(
         "The +1 momentum and -1 contrarian directions were fixed before viewing "
         "the OOS outcomes and are both retained. No full-period parameter search was used."
+    )
+
+
+else:  # Robustness Lab
+    st.title("Robustness Lab")
+    st.caption(
+        "Pre-specified checks ask whether key conclusions survive an alternative "
+        "covariance estimator and plausible turnover costs. The canonical 12-fund "
+        "results remain the sample-covariance, zero-cost baseline."
+    )
+
+    st.subheader("Covariance shrinkage")
+    family = st.selectbox(
+        "Asset family for shrinkage comparison",
+        list(FAMILY_LABELS),
+        format_func=lambda value: FAMILY_LABELS[value],
+        key="robustness_family",
+    )
+    shrinkage = artifacts["shrinkage"].loc[
+        artifacts["shrinkage"]["asset_family"].eq(family)
+    ].copy()
+    shrinkage["Method"] = shrinkage["method"].map(METHOD_LABELS)
+    shrinkage["Estimator"] = shrinkage["covariance_estimator"].map(
+        {"sample": "Sample covariance", "ledoit_wolf": "Ledoit-Wolf"}
+    )
+    shrinkage["Annual return"] = shrinkage["annualised_return"].map(
+        lambda value: f"{value:.1%}"
+    )
+    shrinkage["Annual volatility"] = shrinkage["annualised_volatility"].map(
+        lambda value: f"{value:.1%}"
+    )
+    shrinkage["Sharpe"] = shrinkage["sharpe"].map(lambda value: f"{value:.2f}")
+    shrinkage["Sharpe change"] = shrinkage["delta_sharpe"].map(
+        lambda value: f"{value:+.2f}"
+    )
+    st.dataframe(
+        shrinkage[
+            [
+                "Method", "Estimator", "Annual return", "Annual volatility",
+                "Sharpe", "Sharpe change",
+            ]
+        ],
+        hide_index=True,
+        width="stretch",
+    )
+    st.info(
+        "Ledoit-Wolf automatically estimates shrinkage inside each expanding "
+        "window. It is an untuned robustness result, not a replacement selected "
+        "after seeing out-of-sample performance."
+    )
+
+    st.subheader("Transaction-cost sensitivity")
+    selected_fund = st.selectbox(
+        "Fund for cost curve",
+        artifacts["metrics"]["fund_id"].tolist(),
+        format_func=fund_name,
+    )
+    costs = artifacts["costs"].loc[
+        artifacts["costs"]["fund_id"].eq(selected_fund)
+    ].sort_values("cost_bps")
+    fig, ax = plt.subplots(figsize=(10, 4.8))
+    ax.plot(
+        costs["cost_bps"], costs["sharpe"], marker="o", color=ACCENT,
+        linewidth=1.8,
+    )
+    ax.axhline(0, color="#555555", linewidth=0.8)
+    ax.set_xlabel("One-way transaction cost (bps)")
+    ax.set_ylabel("Annualised Sharpe ratio")
+    ax.set_title(f"Cost sensitivity: {fund_name(selected_fund)}")
+    fig.tight_layout()
+    st.pyplot(fig, width="stretch")
+    plt.close(fig)
+    cost_display = costs[
+        ["cost_bps", "annualised_return", "sharpe", "final_growth_of_1"]
+    ].copy()
+    cost_display["annualised_return"] = cost_display["annualised_return"].map(
+        lambda value: f"{value:.1%}"
+    )
+    cost_display["sharpe"] = cost_display["sharpe"].map(
+        lambda value: f"{value:.2f}"
+    )
+    cost_display["final_growth_of_1"] = cost_display[
+        "final_growth_of_1"
+    ].map(lambda value: f"${value:.2f}")
+    cost_display.columns = [
+        "Cost (bps)", "Annual return", "Sharpe", "Ending $1",
+    ]
+    st.dataframe(cost_display, hide_index=True, width="stretch")
+    st.caption(
+        "Costs are charged on post-launch rebalance turnover only. They do not "
+        "feed back into weight formation, and taxes, spreads and market impact "
+        "outside the fixed bps assumption remain unmodelled."
     )

@@ -5,3 +5,5 @@
 # should load precomputed artifacts from results/, not score sentiment at runtime.
 nltk>=3.8
 pytest>=8,<10
+scikit-learn>=1.5,<2
+python-docx>=1.1,<2

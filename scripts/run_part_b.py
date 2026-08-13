@@ -40,6 +40,10 @@ from src.plot_style import (  # noqa: E402
     sector_color,
 )
 from src.portfolios import SUPPORTED_METHODS, oos_backtest  # noqa: E402
+from src.robustness import (  # noqa: E402
+    evaluate_covariance_shrinkage,
+    transaction_cost_sensitivity,
+)
 from src.sentiment import compare_vader_models, ensure_vader_lexicon  # noqa: E402
 
 
@@ -244,6 +248,26 @@ def _run_fusion(
     )
 
 
+def _run_robustness(
+    state: dict[str, Any], funds: dict[str, Any]
+) -> dict[str, pd.DataFrame]:
+    """Run pre-specified extensions without changing the canonical 12 funds."""
+    family_panels = {
+        "equity": state["equity_returns"],
+        "crypto": state["crypto_returns"],
+        "combined": state["combined_returns"],
+    }
+    shrinkage = evaluate_covariance_shrinkage(
+        family_panels, funds["fund_results"]
+    )
+    costs = transaction_cost_sensitivity(funds["fund_results"])
+    return {
+        "shrinkage_comparison": shrinkage["comparison"],
+        "shrinkage_returns": shrinkage["returns"],
+        "transaction_cost_sensitivity": costs,
+    }
+
+
 def _current_holdings(fund_weights: pd.DataFrame) -> pd.DataFrame:
     latest = fund_weights.groupby("fund_id")["effective_date"].transform("max")
     current = fund_weights.loc[fund_weights["effective_date"].eq(latest)].copy()
@@ -258,6 +282,7 @@ def _write_data_and_tables(
     funds: dict[str, Any],
     sentiment: dict[str, Any],
     fusion: dict[str, Any],
+    robustness: dict[str, pd.DataFrame],
 ) -> dict[str, pd.DataFrame]:
     fund_returns = funds["fund_returns"][
         [
@@ -296,6 +321,9 @@ def _write_data_and_tables(
     sentiment["market_index"].to_csv(DATA_DIR / "market_sentiment_index.csv", index=False)
     fusion_returns.to_csv(DATA_DIR / "fusion_returns.csv", index=False)
     fusion_weights.to_csv(DATA_DIR / "fusion_weights.csv", index=False)
+    robustness["shrinkage_returns"].to_csv(
+        DATA_DIR / "shrinkage_fund_returns.csv", index=False
+    )
 
     metrics.to_csv(TABLE_DIR / "performance_metrics.csv", index=False)
     current.to_csv(TABLE_DIR / "current_holdings.csv", index=False)
@@ -305,12 +333,26 @@ def _write_data_and_tables(
     sentiment["review_sample"].to_csv(
         TABLE_DIR / "sentiment_manual_review_sample.csv", index=False
     )
+    review_template = sentiment["review_sample"].copy()
+    review_template["student_label"] = ""
+    review_template["student_confidence"] = ""
+    review_template["student_notes"] = ""
+    review_template["review_complete"] = False
+    review_template.to_csv(
+        TABLE_DIR / "sentiment_manual_review_template.csv", index=False
+    )
     sentiment["lexicon_candidates"].to_csv(
         TABLE_DIR / "finance_lexicon_candidates.csv", index=False
     )
     pd.DataFrame(
         [{"check": key, "count": value} for key, value in state["foundation_audit"].items()]
     ).to_csv(TABLE_DIR / "foundation_reproduction_audit.csv", index=False)
+    robustness["shrinkage_comparison"].to_csv(
+        TABLE_DIR / "shrinkage_comparison.csv", index=False
+    )
+    robustness["transaction_cost_sensitivity"].to_csv(
+        TABLE_DIR / "transaction_cost_sensitivity.csv", index=False
+    )
 
     return {
         "fund_returns": fund_returns,
@@ -319,6 +361,10 @@ def _write_data_and_tables(
         "metrics": metrics,
         "current_holdings": current,
         "fusion_returns": fusion_returns,
+        "shrinkage_comparison": robustness["shrinkage_comparison"],
+        "transaction_cost_sensitivity": robustness[
+            "transaction_cost_sensitivity"
+        ],
     }
 
 
@@ -529,6 +575,64 @@ def _figure_fusion(fusion_returns: pd.DataFrame) -> pathlib.Path:
     return path
 
 
+def _figure_shrinkage(comparison: pd.DataFrame) -> pathlib.Path:
+    """Show Sharpe changes from sample covariance to Ledoit-Wolf shrinkage."""
+    subset = comparison.loc[
+        comparison["covariance_estimator"].eq("ledoit_wolf")
+    ].copy()
+    subset["label"] = (
+        subset["asset_family"].map(FAMILY_LABELS)
+        + "\n"
+        + subset["method"].map(METHOD_LABELS)
+    )
+    colors = [
+        asset_class_color(value) if value != "combined" else ACCENT_ALT
+        for value in subset["asset_family"]
+    ]
+    fig, ax = plt.subplots(figsize=(12, 6.2))
+    ax.bar(subset["label"], subset["delta_sharpe"], color=colors)
+    ax.axhline(0, color="#555555", linewidth=0.9)
+    ax.set_ylabel("Change in annualised Sharpe")
+    ax.set_title(
+        "Ledoit-Wolf covariance shrinkage vs sample covariance\n"
+        "Same expanding windows and OOS dates; no parameter tuning"
+    )
+    ax.tick_params(axis="x", rotation=20)
+    path = FIGURE_DIR / "covariance_shrinkage_comparison.png"
+    fig.savefig(path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return path
+
+
+def _figure_transaction_costs(sensitivity: pd.DataFrame) -> pathlib.Path:
+    """Plot the complete fixed-bps cost curve for all twelve funds."""
+    fig, axes = plt.subplots(1, 3, figsize=(17, 5.8), sharey=True)
+    for ax, family in zip(axes, ("equity", "crypto", "combined")):
+        family_data = sensitivity.loc[
+            sensitivity["asset_family"].eq(family)
+        ]
+        for method in SUPPORTED_METHODS:
+            line = family_data.loc[family_data["method"].eq(method)]
+            ax.plot(
+                line["cost_bps"], line["sharpe"], marker="o",
+                color=METHOD_COLORS[method], label=METHOD_LABELS[method],
+            )
+        ax.set_title(FAMILY_LABELS[family])
+        ax.set_xlabel("One-way transaction cost (bps)")
+        ax.set_ylabel("Annualised Sharpe ratio")
+        ax.axhline(0, color="#555555", linewidth=0.8)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=4, frameon=True)
+    fig.suptitle(
+        "Transaction-cost sensitivity - realised OOS returns after turnover costs"
+    )
+    fig.tight_layout(rect=[0, 0.10, 1, 0.94])
+    path = FIGURE_DIR / "transaction_cost_sensitivity.png"
+    fig.savefig(path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return path
+
+
 def _write_figures(outputs: dict[str, pd.DataFrame]) -> list[pathlib.Path]:
     return [
         _figure_metrics_table(outputs["metrics"]),
@@ -538,6 +642,8 @@ def _write_figures(outputs: dict[str, pd.DataFrame]) -> list[pathlib.Path]:
         _figure_sharpe(outputs["metrics"]),
         _figure_sentiment(outputs["sector_index"]),
         _figure_fusion(outputs["fusion_returns"]),
+        _figure_shrinkage(outputs["shrinkage_comparison"]),
+        _figure_transaction_costs(outputs["transaction_cost_sensitivity"]),
     ]
 
 
@@ -546,16 +652,20 @@ def main() -> None:
     for directory in (DATA_DIR, TABLE_DIR, FIGURE_DIR):
         directory.mkdir(parents=True, exist_ok=True)
 
-    print("[1/5] Rebuilding Part A data foundation...")
+    print("[1/6] Rebuilding Part A data foundation...")
     state = _prepare_foundation()
-    print("[2/5] Running 12 expanding-window OOS funds...")
+    print("[2/6] Running 12 expanding-window OOS funds...")
     funds = _run_funds(state)
-    print("[3/5] Scoring plain and finance-enhanced VADER sentiment...")
+    print("[3/6] Scoring plain and finance-enhanced VADER sentiment...")
     sentiment = _run_sentiment(state)
-    print("[4/5] Evaluating fixed base/momentum/contrarian fusion variants...")
+    print("[4/6] Evaluating fixed base/momentum/contrarian fusion variants...")
     fusion = _run_fusion(state, funds, sentiment)
-    print("[5/5] Writing app/report CSVs and self-contained figures...")
-    outputs = _write_data_and_tables(state, funds, sentiment, fusion)
+    print("[5/6] Running covariance and transaction-cost robustness checks...")
+    robustness = _run_robustness(state, funds)
+    print("[6/6] Writing app/report CSVs and self-contained figures...")
+    outputs = _write_data_and_tables(
+        state, funds, sentiment, fusion, robustness
+    )
     figures = _write_figures(outputs)
 
     print("\nBuild complete.")
@@ -574,6 +684,13 @@ def main() -> None:
     print(fusion["metrics"].to_string(index=False))
     print("sentiment neutral rates:")
     print(sentiment["summary"].to_string(index=False))
+    print("shrinkage Sharpe changes:")
+    print(
+        robustness["shrinkage_comparison"].loc[
+            lambda frame: frame["covariance_estimator"].eq("ledoit_wolf"),
+            ["asset_family", "method", "delta_sharpe"],
+        ].to_string(index=False)
+    )
     for path in figures:
         print(f"wrote {path.relative_to(ROOT)}")
 

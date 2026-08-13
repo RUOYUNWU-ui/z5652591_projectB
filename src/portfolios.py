@@ -176,8 +176,49 @@ def _prepare_returns(
     return matrix, metadata, spec
 
 
-def _regularised_covariance(history: pd.DataFrame, periods_per_year: int) -> np.ndarray:
-    covariance = history.cov().to_numpy(dtype="float64") * periods_per_year
+def _normalise_covariance_estimator(estimator: str) -> str:
+    """Resolve supported covariance-estimator names without changing defaults."""
+    aliases = {
+        "sample": "sample",
+        "sample_covariance": "sample",
+        "ledoit_wolf": "ledoit_wolf",
+        "ledoit-wolf": "ledoit_wolf",
+        "lw": "ledoit_wolf",
+    }
+    resolved = aliases.get(str(estimator).strip().lower())
+    if resolved is None:
+        raise ValueError("covariance_estimator must be 'sample' or 'ledoit_wolf'")
+    return resolved
+
+
+def _regularised_covariance(
+    history: pd.DataFrame,
+    periods_per_year: int,
+    estimator: str = "sample",
+) -> np.ndarray:
+    """Estimate annualised covariance and add a scale-proportional numeric ridge.
+
+    ``sample`` is the frozen baseline. ``ledoit_wolf`` is an untuned robustness
+    extension: its shrinkage intensity is estimated from each expanding window,
+    never selected using OOS performance.
+    """
+    resolved = _normalise_covariance_estimator(estimator)
+    if resolved == "sample":
+        covariance = history.cov().to_numpy(dtype="float64") * periods_per_year
+    else:
+        try:
+            from sklearn.covariance import LedoitWolf
+        except ImportError as exc:  # pragma: no cover - dependency guidance
+            raise ImportError(
+                "Ledoit-Wolf robustness analysis requires scikit-learn from "
+                "requirements-dev.txt"
+            ) from exc
+        covariance = (
+            LedoitWolf(assume_centered=False)
+            .fit(history.to_numpy(dtype="float64"))
+            .covariance_
+            * periods_per_year
+        )
     average_variance = float(np.trace(covariance) / len(covariance))
     ridge = max(average_variance * 1e-8, 1e-12)
     return covariance + np.eye(len(covariance)) * ridge
@@ -188,6 +229,7 @@ def _solve_weights(
     method: str,
     periods_per_year: int,
     previous: np.ndarray | None = None,
+    covariance_estimator: str = "sample",
 ) -> np.ndarray:
     """Solve one long-only, fully-invested portfolio without exposure caps."""
     n_assets = history.shape[1]
@@ -195,7 +237,9 @@ def _solve_weights(
     if method == "equal_weight":
         return equal
 
-    covariance = _regularised_covariance(history, periods_per_year)
+    covariance = _regularised_covariance(
+        history, periods_per_year, estimator=covariance_estimator
+    )
     mean = history.mean().to_numpy(dtype="float64") * periods_per_year
     start = previous if previous is not None else equal
     start = np.clip(np.asarray(start, dtype="float64"), 0.0, None)
@@ -297,7 +341,11 @@ def _monthly_rebalance_dates(matrix: pd.DataFrame, initial_window: int) -> list[
     return [date for date in first_per_month if matrix.index.get_loc(date) + 1 < len(matrix)]
 
 
-def oos_backtest(returns: pd.DataFrame, method: str = "min_variance") -> dict[str, Any]:
+def oos_backtest(
+    returns: pd.DataFrame,
+    method: str = "min_variance",
+    covariance_estimator: str = "sample",
+) -> dict[str, Any]:
     """Run a monthly expanding-window walk-forward out-of-sample backtest.
 
     Parameters
@@ -309,6 +357,9 @@ def oos_backtest(returns: pd.DataFrame, method: str = "min_variance") -> dict[st
     method
         One of equal weight, minimum variance, maximum Sharpe/tangency, or
         risk parity (see ``SUPPORTED_METHODS``).
+    covariance_estimator
+        ``sample`` preserves the frozen baseline. ``ledoit_wolf`` enables the
+        separately reported, untuned covariance-shrinkage robustness study.
 
     Returns
     -------
@@ -328,6 +379,7 @@ def oos_backtest(returns: pd.DataFrame, method: str = "min_variance") -> dict[st
     its applicable weight.
     """
     resolved_method = _normalise_method(method)
+    resolved_covariance = _normalise_covariance_estimator(covariance_estimator)
     matrix, metadata, spec = _prepare_returns(returns)
     rebalance_dates = _monthly_rebalance_dates(matrix, spec.initial_window)
     if not rebalance_dates:
@@ -343,7 +395,11 @@ def oos_backtest(returns: pd.DataFrame, method: str = "min_variance") -> dict[st
         effective_position = matrix.index.get_loc(rebalance_date) + 1
         effective_date = matrix.index[effective_position]
         weights = _solve_weights(
-            history, resolved_method, spec.periods_per_year, previous=previous
+            history,
+            resolved_method,
+            spec.periods_per_year,
+            previous=previous,
+            covariance_estimator=resolved_covariance,
         )
         previous = weights
         schedules.append({"effective_date": effective_date, "weights": weights})
@@ -422,5 +478,6 @@ def oos_backtest(returns: pd.DataFrame, method: str = "min_variance") -> dict[st
             "rebalance_frequency": "monthly_first_trading_day",
             "risk_free_rate": 0.0,
             "transaction_cost": 0.0,
+            "covariance_estimator": resolved_covariance,
         },
     }

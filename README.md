@@ -1,16 +1,14 @@
-# FinTech Project - Part B
-
-> FIRST: rename this folder to <yourZID>_projectB (for example z1234567_projectB)
-> and move it into fins-agent/fins2026/. The folder name carrying your zID is your
-> submission.
+# SignalYield - FINS5545 Project B
 
 Part B: funds, sentiment, and the app (DFF Stations 3-4). This folder is also your
 public GitHub repository; the app entrypoint is streamlit_app.py at the root.
 
 ## How to run
 
-    pip install -r requirements.txt -r requirements-dev.txt   # dev adds VADER + pytest
+    pip install -r requirements.txt -r requirements-dev.txt
     python scripts/run_part_b.py            # reproduces your results into results/
+    python scripts/build_report.py           # rebuilds report/report.docx
+    python scripts/validate_sentiment_review.py  # after student labels 50 headlines
     streamlit run streamlit_app.py          # runs the app locally
 
 Load raw data through src/data_access.py (see context/DATA_GUIDE.md); never commit
@@ -22,25 +20,41 @@ results/ - those ARE committed.
 - streamlit_app.py    the app entrypoint (repo root)
 - .streamlit/         app config
 - PROJECT_BRIEF.md    the full assignment brief for your course (read this first)
-- src/                your code (data_access is provided; portfolios/sentiment/fusion are yours)
+- src/                data, portfolios, sentiment, fusion, and robustness code
 - scripts/            runnable scripts that reproduce your results
 - results/            your outputs: figures in results/figures/, tables in results/tables/, app data artifacts in results/data/
 - context/            provided data guide and project context (do not edit)
-- report/             your report - see report/OUTLINE.md (author in Word, submit report.pdf)
+- report/             editable Word report, PDF, QA record, and student-review instructions
 - ai/                 your prompt logs and AI notes
-- requirements-dev.txt build/repro-only deps (nltk and pytest); keep them out of the deployed app
-- AGENTS.md / CLAUDE.md   replace the stub for your tool (you need just one) with your own
+- requirements-dev.txt build/repro-only dependencies; excluded from app deployment
+- AGENTS.md / CLAUDE.md project-specific AI instructions
+
+## Research design
+
+- 12 canonical funds: equity, crypto, and combined universes crossed with equal
+  weight, minimum variance, maximum Sharpe, and risk parity.
+- Monthly expanding-window OOS weights take effect on the next trading day.
+- Finance-enhanced VADER sector index and fixed base/momentum/contrarian fusion.
+- Separately labelled robustness: Ledoit-Wolf covariance shrinkage and a
+  0/10/25/50/100 bps transaction-cost curve.
+- Six-page investor app, including a Robustness Lab. The app reads only
+  precomputed `results/` artifacts.
+
+The baseline assumes a zero risk-free rate and zero transaction costs. The
+cost curve is a sensitivity analysis, not a silently substituted baseline.
 
 ## Deploy + hand in
 
-This folder is its own GitHub repo, independent of fins-agent. Your AI agent can run
-the check and push the repo; the browser deploy is yours (it needs your login). See
+This folder is its own GitHub repo. The automated build, tests, report, and
+precomputed artifacts are committed here. See
 PROJECT_BRIEF.md Appendix D and docs/STUDENT_DEPLOY.md (in this folder). In short:
 
     python scripts/check_handin.py        # your agent can run this
     # commit your precomputed app artifacts under results/ (the app reads them)
-    # git init in this folder, then push the contents to a NEW private GitHub repo
+    # commit and push the precomputed artifacts
 
-Then YOU connect the repo on share.streamlit.io (entrypoint streamlit_app.py). At
-hand-in, make the repo PUBLIC, submit the live URL + repo link, and also zip this
-whole folder and upload the zip to Moodle.
+The current build repository is private. At hand-in, the student must make it
+PUBLIC, confirm the live Streamlit app, submit both URLs, and upload the zipped
+project folder to Moodle. The student must also complete the 50-headline review
+described in `report/MANUAL_SENTIMENT_REVIEW.md` and rewrite the final report
+interpretation in their own voice.

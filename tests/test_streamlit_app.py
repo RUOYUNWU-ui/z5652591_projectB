@@ -1,4 +1,4 @@
-"""Acceptance tests for the five-page, precomputed-results Streamlit app.
+"""Acceptance tests for the six-page, precomputed-results Streamlit app.
 
 Run from the project root with::
 
@@ -26,7 +26,7 @@ def _app() -> AppTest:
     return app
 
 
-def test_all_five_pages_open_without_exceptions() -> None:
+def test_all_six_pages_open_without_exceptions() -> None:
     """Every page in the investor journey should render from saved artifacts."""
     app = _app()
     pages = [
@@ -35,6 +35,7 @@ def test_all_five_pages_open_without_exceptions() -> None:
         "Fund Fact Sheet",
         "Allocation Builder",
         "Sentiment Analytics",
+        "Robustness Lab",
     ]
     for page in pages:
         app.sidebar.radio[0].set_value(page)
@@ -60,7 +61,7 @@ def test_invalid_allocation_is_blocked_with_clear_message() -> None:
 
 
 if __name__ == "__main__":
-    test_all_five_pages_open_without_exceptions()
-    print("all five Streamlit pages: PASS")
+    test_all_six_pages_open_without_exceptions()
+    print("all six Streamlit pages: PASS")
     test_invalid_allocation_is_blocked_with_clear_message()
     print("invalid allocation guard: PASS")

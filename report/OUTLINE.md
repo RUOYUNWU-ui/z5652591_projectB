@@ -149,3 +149,9 @@ equal-weight/minimum-variance blend, or a tail-aware (mean-CVaR) objective.
 Pick at most one of these as a second extension - one well-executed extension
 beats several shallow ones (brief, Section "What counts as innovation").
 
+**Amendment (2026-08-14):** two closely related robustness extensions were
+completed because both reuse the frozen backtest and answer distinct investor
+questions without tuning: Ledoit-Wolf covariance shrinkage tests estimator
+risk, while the fixed-bps transaction-cost curve tests implementation drag.
+Both are reported separately from the canonical 12 funds; neither parameter or
+baseline result was changed after viewing OOS performance.
