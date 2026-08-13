@@ -654,8 +654,8 @@ def build() -> pathlib.Path:
         "the repository root. It writes app data, report tables and figures. Automated "
         "tests cover portfolio timing, sentiment lagging, fusion invariants, robustness "
         "and all six app pages. scripts/check_handin.py audits required files and frozen "
-        "data access. Detailed prompts, corrections and AI limitations are recorded in "
-        "ai/prompt_log_part_b.md and report/QA_REPORT.md."
+        "data access. Detailed prompts, corrections, verification evidence and AI "
+        "limitations are recorded in ai/prompt_log_part_b.md."
     )
     add_table(doc, ["Evidence", "Location"], [
         ["12-fund returns and weights", "results/data/fund_returns.csv; fund_weights.csv"],
