@@ -446,6 +446,10 @@ and prepare a clean Moodle archive.
 > https://z5652591projectb-carymh8kgzkfbrbzdhyjr7.streamlit.app/ and check every
 > page rather than only the home page."
 
+> "For the final Moodle package, retain the teacher-provided structure, full
+> code, reproducible results, report and AI workflow, but remove redundant
+> internal documents. Do not delete evidence required by the app or rebuild."
+
 ### What the assistant produced
 
 A broad audit found three stale split fusion files that the current pipeline no
@@ -463,7 +467,9 @@ The public repository is
 `https://github.com/RUOYUNWU-ui/z5652591_projectB` on `main`. The live app was
 opened without an authenticated Streamlit session and all six pages displayed
 their expected content without application alerts. A final Git-snapshot ZIP was
-created for Moodle.
+created for Moodle. The final packaging audit removed three superseded internal
+documents whose evidence had already been consolidated into this log and the
+submission outputs; the resulting tracked submission contains 70 files.
 
 ### What was wrong or risky
 
@@ -484,9 +490,12 @@ the loader; I ran the official pipeline in the existing project environment
 with `pyarrow 24` and the backup URL already supported by the frozen loader.
 After testing, I removed generated caches, reran the hand-in checker, committed
 and pushed the verified snapshot, and rebuilt the ZIP from Git rather than from
-an unfiltered working folder. I accepted deployment as complete only after an
-independent page-by-page public-browser check. Moodle upload remains my own
-authenticated submission action.
+an unfiltered working folder. For the last packaging pass, I kept every starter
+file, runtime dependency, test, report source, AI record and reproducible result,
+but removed the duplicate completion matrix, superseded manual-review
+instructions and internal QA report after consolidating their relevant evidence.
+I accepted deployment as complete only after an independent page-by-page public-
+browser check. Moodle upload remains my own authenticated submission action.
 
 ---
 
