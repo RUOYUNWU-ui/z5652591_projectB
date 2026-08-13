@@ -4,6 +4,57 @@ Dated entries, most recent first. Template: `ai/prompt_log_template.md`.
 
 ---
 
+## 2026-08-14 - Reproducibility correction and crypto-gap investigation
+
+### What I wanted
+Make the reproducibility claim literal for the complete committed `results/`
+tree, correct the stale post-Prompt-8 sentence in the QA report, and investigate
+the crypto/reference Sharpe gap without changing the frozen model.
+
+### What the agent produced
+An actual build from a deleted `results/` directory generated exactly 21 files.
+Comparing that manifest with `git ls-files results` identified six tracked-only
+files: three obsolete per-variant fusion CSVs and three `.gitkeep` placeholders.
+All six were removed; the current combined `fusion_returns.csv` is the sole
+canonical variant return file. No clean-build output was absent from Git.
+Two independent clean builds then matched by SHA-256 for all 21 generated
+files, including figures and supporting tables, not merely the four marker
+files.
+
+The diagnostic printed all 36 equity and crypto rebalance dates and observation
+counts, recomputed the ridge at every decision, verified the published crypto
+return moments, and recorded the full findings in `report/QA_REPORT.md`.
+
+### What was wrong or risky
+The earlier reproducibility check proved only the four required CSV hashes and
+did not compare the complete tracked result manifest. Consequently, it missed
+orphaned files that a fresh checkout could retain after an in-place build but a
+truly empty build would never create. The QA report also retained a sentence
+written before Prompt 8 saying Git had not been initialised, even after the
+private push occurred.
+
+The requested full `pytest tests/` run initially could not start because
+`pytest` was not declared in `requirements-dev.txt`. I added `pytest>=8,<10`,
+kept it out of deployment requirements, and reran successfully: 8 tests passed.
+
+The crypto Sharpe gap looked superficially like it might be caused by covariance
+scaling. It is not: the ridge is exactly `1e-8` of average variance in every
+equity and crypto window, the absolute floor never binds, crypto covariance is
+better conditioned than equity covariance, and equal weight—where no covariance
+is used—shows the gap too. The exact 252/365 calendars and expanding counts are
+also correct. The underlying crypto moments reproduce at 0.2226734509% mean and
+5.1994728333% daily standard deviation.
+
+### What I changed and why
+Only stale artifacts and documentation were changed; no return, window,
+annualisation, optimiser, regularisation, or fusion parameter changed. The
+remaining lecture difference is documented as unexplained rather than tuned
+away. GitHub identity was checked read-only: `RUOYUNWU-ui/desktop-tutorial`,
+private, default branch `main`. Repository renaming and visibility were not
+changed.
+
+---
+
 ## 2026-08-13 - Codex Prompt 8: private release preparation
 
 ### What I wanted

@@ -22,7 +22,7 @@ the student's own writing/login.
 | Prompt 4 | Keep untuned +1 and -1 results, regardless of outcome | Base/momentum/contrarian Sharpe = 0.590/0.622/0.747; all three result series are saved | **Proved** |
 | Prompt 5 | One official end-to-end build from hosted data | `scripts/run_part_b.py` | **Proved** |
 | Prompt 5 | Four exact marker/app CSV names and schemas | `fund_returns.csv`, `fund_weights.csv`, `sector_sentiment_index.csv`, `performance_metrics.csv`; schemas checked by build and QA | **Proved** |
-| Prompt 5 | Reproducibility after deleting results | Both clean builds have identical row counts and SHA-256 hashes; see `report/QA_REPORT.md` | **Proved** |
+| Prompt 5 | Reproducibility after deleting results | Two independent clean builds produced exactly the same 21 paths and identical SHA-256 hashes for all 21 files; see `report/QA_REPORT.md` | **Proved** |
 | Prompt 5 | Required self-contained exhibits with a custom, non-default palette | Seven PNG exhibits under `results/figures/`; visually inspected | **Proved** |
 | Prompt 6 | Five-page investor journey reading precomputed artifacts only | `streamlit_app.py`; no raw loader, NLTK, scoring or optimiser references | **Proved** |
 | Prompt 6 | Every page opens and invalid allocation is handled | Durable test in `tests/test_streamlit_app.py` passes all five pages and the non-100% guard | **Proved** |
