@@ -5,7 +5,7 @@ Last audited: 2026-08-14
 **Proved** means that the current repository contains direct evidence and the
 relevant command or manual check has passed. **External hand-in action** means
 that the project is ready but the action depends on the student's authenticated
-Streamlit or Moodle session.
+Moodle session.
 
 | Scope | Requirement | Current evidence | Status |
 |---|---|---|---|
@@ -19,21 +19,17 @@ Streamlit or Moodle session.
 | Fusion | Fixed 60/20 standardisation and lambda 0/+1/-1; lambda-zero identity | `src/fusion.py`; `tests/test_fusion.py`; fusion result files | **Proved** |
 | Innovation | Ledoit-Wolf shrinkage and 0/10/25/50/100 bps cost sensitivity | `src/robustness.py`; comparison tables and Figures A7-A8 | **Proved** |
 | Reproducibility | One official build recreates the final result manifest | `scripts/run_part_b.py`; 28 generated files: 7 data, 9 figures, 12 tables | **Proved** |
-| App | Six-page investor journey reads only precomputed artifacts | `streamlit_app.py`; `tests/test_streamlit_app.py` | **Proved locally** |
+| App | Six-page investor journey reads only precomputed artifacts | `streamlit_app.py`; `tests/test_streamlit_app.py`; all six live pages checked | **Proved locally and live** |
 | Report | Final Word/PDF, Harvard references, required tables and Figures A1-A8 interpreted | `report/report.docx`; `report/report.pdf`; 14-page visual QA | **Proved** |
 | AI workflow | Project instructions and teacher-format prompt log | `AGENTS.md`; `CLAUDE.md`; `ai/prompt_log_part_b.md` | **Proved** |
 | GitHub | Public repository on `main` | `https://github.com/RUOYUNWU-ui/z5652591_projectB` | **Proved** |
-| Streamlit | Public app opens from the public repository | Live URL must be deployed/confirmed in the student's Streamlit session | **External hand-in action** |
-| Moodle | Zip, public repo URL and live app URL submitted | Final zip is prepared locally; Moodle upload remains | **External hand-in action** |
+| Streamlit | Public app opens from the public repository | `https://z5652591projectb-carymh8kgzkfbrbzdhyjr7.streamlit.app/`; six pages opened without app errors on 2026-08-14 | **Proved** |
+| Moodle | Zip, public repo URL and live app URL submitted | Final zip and both URLs are prepared; Moodle upload remains | **External hand-in action** |
 
 ## Remaining external hand-in actions
 
-1. Deploy or confirm the Streamlit Community Cloud app from
-   `RUOYUNWU-ui/z5652591_projectB`, branch `main`, entrypoint
-   `streamlit_app.py`.
-2. Open the live URL in a logged-out browser and record it in the Moodle
-   submission.
-3. Upload the final zip together with the public repository and live app URLs.
+1. Upload the final zip to Moodle.
+2. Include the public repository and verified live app URLs in the Moodle
+   submission where requested.
 
-These account-level actions do not require further model, report or code changes
-unless the live deployment reveals an environment-specific error.
+This account-level action does not require further model, report or code changes.

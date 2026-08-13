@@ -57,10 +57,14 @@ The public repository is:
 
     https://github.com/RUOYUNWU-ui/z5652591_projectB
 
+The verified public Streamlit app is:
+
+    https://z5652591projectb-carymh8kgzkfbrbzdhyjr7.streamlit.app/
+
 The 50-headline and 24-term reviews are complete and preserved by the build.
 The final student-edited report is `report/report.docx`, with the submission PDF
 at `report/report.pdf`. `scripts/build_report.py` intentionally writes
 `report/report_generated_draft.docx` so a reproducible AI/evidence draft cannot
-overwrite the student's final Word source. Before hand-in, confirm the live
-Streamlit URL in a logged-out browser, submit both URLs, and upload the final zip
-to Moodle.
+overwrite the student's final Word source. The live app was opened without a
+Streamlit account session on 14 August 2026 and all six pages loaded without an
+application error. Submit both URLs and upload the final zip to Moodle.

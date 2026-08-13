@@ -355,3 +355,15 @@ app pages and public repository
 `https://github.com/RUOYUNWU-ui/z5652591_projectB`. The only unverified course
 deliverable is the browser-authenticated live Streamlit URL; it must be opened in
 a logged-out browser and submitted with the public repository and Moodle zip.
+
+## Addendum - 2026-08-14: public Streamlit deployment verified
+
+The student completed deployment at
+`https://z5652591projectb-carymh8kgzkfbrbzdhyjr7.streamlit.app/`. The public app
+was then opened in a browser without an authenticated Streamlit account session.
+The Home page loaded the expected 12-fund, three-family and four-method summary.
+Each of the five remaining navigation choices was opened in turn: Fund
+Comparison, Fund Fact Sheet, Allocation Builder, Sentiment Analytics and
+Robustness Lab. Their expected headings and evidence appeared, and no application
+alerts or exceptions were present. This closes the previously outstanding live
+deployment item. Moodle upload remains an account-level submission action.

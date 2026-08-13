@@ -12,7 +12,8 @@ the mechanical ones.
       out-of-sample with no look-ahead, with a fact sheet.
 - [x] All six Streamlit pages pass the local app test runtime.
 - [x] The GitHub repo is PUBLIC: https://github.com/RUOYUNWU-ui/z5652591_projectB
-- [ ] The live Streamlit app loads in a logged-out browser and its URL is recorded.
+- [x] The live Streamlit app loads without an authenticated Streamlit session:
+      https://z5652591projectb-carymh8kgzkfbrbzdhyjr7.streamlit.app/
 - [x] Raw data loads through src/data_access.py; no raw data or secrets committed.
       (Your derived results/ artifacts - the CSVs the app reads - ARE committed.)
 - [x] AGENTS.md and CLAUDE.md contain project-specific instructions.

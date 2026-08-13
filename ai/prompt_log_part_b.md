@@ -546,3 +546,42 @@ checker, and used the verified Git snapshot to prepare the Moodle archive. The
 Streamlit sign-in page was left as an explicit handoff: deployment can be claimed
 complete only after the student authenticates and the resulting public URL opens
 in a logged-out browser.
+
+---
+
+## 10. Verify the student-deployed public application (14 August 2026)
+
+### What I wanted
+
+Close the final technical delivery gap after I deployed the Streamlit app myself:
+verify the public URL and every investor-facing page, then record the deployment
+consistently in the repository and final hand-in materials.
+
+### Prompt(s)
+
+> "I could not log in through the shared browser, so I deployed it myself:
+> https://z5652591projectb-carymh8kgzkfbrbzdhyjr7.streamlit.app/"
+
+### What the assistant produced
+
+The assistant opened the public app without relying on my authenticated
+Streamlit session. It confirmed the Home page and then opened Fund Comparison,
+Fund Fact Sheet, Allocation Builder, Sentiment Analytics and Robustness Lab. All
+six pages displayed their expected headings and no application alerts or
+exceptions appeared. It recorded the verified URL in the README, submission
+checklist, completion matrix and QA report, then prepared to refresh the GitHub
+commit and clean hand-in archive.
+
+### What was wrong or risky
+
+A successful deployment link alone did not prove that the public app loaded for
+an unauthenticated viewer or that every navigation path could render its
+precomputed artifacts. Leaving the earlier documents unchanged would also have
+made the final repository falsely state that deployment remained outstanding.
+
+### What I changed and why
+
+I treated deployment as verified only after an independent page-by-page browser
+check. I changed delivery documentation rather than model code or results,
+because the live inspection found no environment-specific defect. Moodle upload
+remains a student account action and is not reported as completed.
